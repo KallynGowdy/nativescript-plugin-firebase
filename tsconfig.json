@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "moduleResolution": "classic"
+        "moduleResolution": "node"
     },
     "exclude": [
         "node_modules",
