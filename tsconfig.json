@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "classic"
+    },
+    "exclude": [
+        "node_modules",
+        "platforms"
+    ]
+}

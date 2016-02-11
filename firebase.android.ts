@@ -1,36 +1,42 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var appModule = require("application");
-var firebase_common_1 = require("./firebase-common");
-var AndroidFirebaseDataSnapshot = (function () {
-    function AndroidFirebaseDataSnapshot(snap) {
+import * as appModule from "application";
+import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot} from "./firebase-common";
+
+declare var java: any;
+declare var com;
+
+export class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+
+    private _snap: any;
+    private _value: any;
+    private _key: string;
+
+    constructor(snap) {
         this._snap = snap;
     }
-    AndroidFirebaseDataSnapshot.prototype.val = function () {
+
+    public val(): any {
         return Firebase.toJsObject(this._snap.getValue());
-    };
-    AndroidFirebaseDataSnapshot.prototype.key = function () {
-        return this._snap.getKey();
-    };
-    return AndroidFirebaseDataSnapshot;
-})();
-exports.AndroidFirebaseDataSnapshot = AndroidFirebaseDataSnapshot;
-var Firebase = (function (_super) {
-    __extends(Firebase, _super);
-    function Firebase(instance) {
-        _super.call(this, instance);
     }
-    Firebase.toHashMap = function (obj) {
+
+    public key(): string {
+        return this._snap.getKey()
+    }
+}
+
+export default class Firebase extends FirebaseCommon implements IFirebase {
+
+    constructor(instance: any) {
+        super(instance);
+    }
+
+    public static toHashMap(obj) {
         var node = new java.util.HashMap();
         for (var property in obj) {
             if (obj.hasOwnProperty(property)) {
                 if (obj[property] !== null) {
                     switch (typeof obj[property]) {
                         case 'object':
-                            node.put(property, firebase.toHashMap(obj[property], node));
+                            node.put(property, Firebase.toHashMap(obj[property]));
                             break;
                         case 'boolean':
                             node.put(property, java.lang.Boolean.valueOf(String(obj[property])));
@@ -50,11 +56,12 @@ var Firebase = (function (_super) {
         }
         return node;
     };
-    ;
-    Firebase.toJsObject = function (javaObj) {
+
+    public static toJsObject(javaObj: any): any {
         if (javaObj === null || typeof javaObj != "object") {
             return javaObj;
         }
+
         var node;
         switch (javaObj.getClass().getName()) {
             case 'java.lang.Boolean':
@@ -65,7 +72,7 @@ var Firebase = (function (_super) {
             case 'java.util.ArrayList':
                 node = [];
                 for (var i = 0; i < javaObj.size(); i++) {
-                    node[i] = firebase.toJsObject(javaObj.get(i));
+                    node[i] = Firebase.toJsObject(javaObj.get(i));
                 }
                 break;
             default:
@@ -75,7 +82,7 @@ var Firebase = (function (_super) {
                     var item = iterator.next();
                     switch (item.getClass().getName()) {
                         case 'java.util.HashMap$HashMapEntry':
-                            node[item.getKey()] = firebase.toJsObject(item.getValue());
+                            node[item.getKey()] = Firebase.toJsObject(item.getValue());
                             break;
                         case 'java.lang.String':
                             node[item.getKey()] = String(item.getValue());
@@ -94,32 +101,31 @@ var Firebase = (function (_super) {
         }
         return node;
     };
-    ;
-    Firebase.getCallbackData = function (snapshot) {
+
+    public static getCallbackData(snapshot): IFirebaseDataSnapshot {
         return new AndroidFirebaseDataSnapshot(snapshot);
     };
-    ;
-    Firebase.init = function (arg) {
-        return new Promise(function (resolve, reject) {
+
+    public static init(arg: any) {
+        return new Promise((resolve, reject) => {
             try {
                 var JavaFirebase = com.firebase.client.Firebase;
                 JavaFirebase.setAndroidContext(appModule.android.context);
                 var instance = new JavaFirebase(arg.url);
                 var firebase = new Firebase(instance);
                 resolve(firebase);
-            }
-            catch (ex) {
+            } catch (ex) {
                 console.log("Error in firebase.init: " + ex);
                 reject(ex);
             }
         });
     };
-    ;
-    Firebase.prototype.login = function (arg) {
-        return new Promise(function (resolve, reject) {
+
+    public login(arg: any) {
+        return new Promise(function(resolve, reject) {
             try {
                 var authorizer = new com.firebase.client.Firebase.AuthResultHandler({
-                    onAuthenticated: function (authData) {
+                    onAuthenticated: function(authData) {
                         resolve({
                             uid: authData.getUid(),
                             provider: authData.getProvider(),
@@ -128,167 +134,154 @@ var Firebase = (function (_super) {
                             token: authData.getToken()
                         });
                     },
-                    onAuthenticationError: function (firebaseError) {
+                    onAuthenticationError: function(firebaseError) {
                         reject(firebaseError.getMessage());
                     }
                 });
+
                 var type = arg.type;
-                if (type === firebase.LoginType.ANONYMOUS) {
+
+                if (type === FirebaseCommon.LoginType.ANONYMOUS) {
                     this.instance.authAnonymously(authorizer);
-                }
-                else if (type === firebase.LoginType.PASSWORD) {
+                } else if (type === Firebase.LoginType.PASSWORD) {
                     if (!arg.email || !arg.password) {
                         reject("Auth type emailandpassword requires an email and password argument");
-                    }
-                    else {
+                    } else {
                         this.instance.authWithPassword(arg.email, arg.password, authorizer);
                     }
-                }
-                else {
+                } else {
                     reject("Unsupported auth type: " + type);
                 }
-            }
-            catch (ex) {
+            } catch (ex) {
                 console.log("Error in firebase.login: " + ex);
                 reject(ex);
             }
         });
     };
-    ;
-    Firebase.prototype.createUser = function (arg) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
+
+    public createUser(arg: any): Promise<any> {
+        return new Promise((resolve, reject) => {
             try {
                 var valueResultHandler = new com.firebase.client.Firebase.ValueResultHandler({
-                    onSuccess: function (authData) {
+                    onSuccess: function(authData) {
                         console.log("--- created: " + authData);
-                        resolve(firebase.toJsObject(authData).uid);
+                        resolve(Firebase.toJsObject(authData).uid);
                     },
-                    onError: function (firebaseError) {
+                    onError: function(firebaseError) {
                         reject(firebaseError.getMessage());
                     }
                 });
+
                 if (!arg.email || !arg.password) {
                     reject("Creating a user requires an email and password argument");
+                } else {
+                    this.instance.createUser(arg.email, arg.password, valueResultHandler);
                 }
-                else {
-                    _this.instance.createUser(arg.email, arg.password, valueResultHandler);
-                }
-            }
-            catch (ex) {
+            } catch (ex) {
                 console.log("Error in firebase.createUser: " + ex);
                 reject(ex);
             }
         });
     };
-    ;
-    Firebase.prototype.push = function (data) {
+
+    public push(data: any): Promise<boolean> {
         return new Firebase(this.instance.push()).set(data);
     };
-    ;
-    Firebase.prototype.setValue = function (path, val) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
+
+    public setValue(path, val) {
+        return new Promise((resolve, reject) => {
             try {
-                _this.instance.child(path).setValue();
+                this.instance.child(path).setValue();
                 resolve();
-            }
-            catch (ex) {
+            } catch (ex) {
                 console.log("Error in firebase.setValue: " + ex);
                 reject(ex);
             }
         });
     };
-    ;
-    Firebase.prototype.query = function (updateCallback, path, options) {
-        return new Promise(function (resolve, reject) {
+
+    public query(updateCallback, path, options) {
+        return new Promise(function(resolve, reject) {
             try {
                 var query;
+      
                 // orderBy
-                if (options.orderBy.type === firebase.QueryOrderByType.KEY) {
+                if (options.orderBy.type === Firebase.QueryOrderByType.KEY) {
                     query = this.instance.child(path).orderByKey();
-                }
-                else if (options.orderBy.type === firebase.QueryOrderByType.VALUE) {
+                } else if (options.orderBy.type === Firebase.QueryOrderByType.VALUE) {
                     query = this.instance.child(path).orderByValue();
-                }
-                else if (options.orderBy.type === firebase.QueryOrderByType.PRIORITY) {
+                } else if (options.orderBy.type === Firebase.QueryOrderByType.PRIORITY) {
                     query = this.instance.child(path).orderByPriority();
-                }
-                else if (options.orderBy.type === firebase.QueryOrderByType.CHILD) {
+                } else if (options.orderBy.type === Firebase.QueryOrderByType.CHILD) {
                     if (!options.orderBy.value) {
                         reject("When orderBy.type is 'child' you must set orderBy.value as well.");
                         return;
                     }
                     query = this.instance.child(path).orderByChild(options.orderBy.value);
-                }
-                else {
+                } else {
                     reject("Invalid orderBy.type, use constants like firebase.QueryOrderByType.VALUE");
                     return;
                 }
+
                 // range
                 if (options.range && options.range.type) {
                     if (!options.range.value) {
                         reject("Please set range.value");
                         return;
                     }
-                    if (options.range.type === firebase.QueryRangeType.START_AT) {
+                    if (options.range.type === Firebase.QueryRangeType.START_AT) {
                         query = query.startAt(options.range.value);
-                    }
-                    else if (options.range.type === firebase.QueryRangeType.END_AT) {
+                    } else if (options.range.type === Firebase.QueryRangeType.END_AT) {
                         query = query.endAt(options.range.value);
-                    }
-                    else if (options.range.type === firebase.QueryRangeType.EQUAL_TO) {
+                    } else if (options.range.type === Firebase.QueryRangeType.EQUAL_TO) {
                         query = query.equalTo(options.range.value);
-                    }
-                    else {
+                    } else {
                         reject("Invalid range.type, use constants like firebase.QueryRangeType.START_AT");
                         return;
                     }
                 }
+
                 // limit
                 if (options.limit && options.limit.type) {
                     if (!options.limit.value) {
                         reject("Please set limit.value");
                         return;
                     }
-                    if (options.limit.type === firebase.QueryLimitType.FIRST) {
+                    if (options.limit.type === Firebase.QueryLimitType.FIRST) {
                         query = query.limitToFirst(options.limit.value);
-                    }
-                    else if (options.limit.type === firebase.QueryLimitType.LAST) {
+                    } else if (options.limit.type === Firebase.QueryLimitType.LAST) {
                         query = query.limitToLast(options.limit.value);
-                    }
-                    else {
+                    } else {
                         reject("Invalid limit.type, use constants like firebase.QueryLimitType.FIRST");
                         return;
                     }
                 }
-                firebase._addObservers(query, updateCallback);
+
+                this._addObservers(query, updateCallback);
                 resolve();
-            }
-            catch (ex) {
+            } catch (ex) {
                 console.log("Error in firebase.query: " + ex);
                 reject(ex);
             }
         });
     };
-    ;
-    Firebase.prototype.remove = function (key) {
-        if (key) {
+
+    public remove(key?: string): Promise<boolean> {
+        if(key) {
             return this.child(key).set(null);
-        }
-        else {
+        } else {
             return this.set(null);
         }
     };
-    ;
-    Firebase.prototype.on = function (eventName, callback, errorCallback) {
+
+    public on(eventName: string, callback: Function, errorCallback?: (err: any) => void): Function {
         switch (eventName) {
             case "value":
                 var eventListener = new com.firebase.client.ValueEventListener({
-                    onDataChange: function (snapshot) {
+                    onDataChange: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onCancelled: function (err) {
+                    onCancelled: (err) => {
                         if (errorCallback) {
                             errorCallback(err);
                         }
@@ -301,19 +294,19 @@ var Firebase = (function (_super) {
             case "child_removed":
             case "child_moved":
                 var listener = new com.firebase.client.ChildEventListener({
-                    onChildAdded: function (snapshot, previousChildKey) {
+                    onChildAdded: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onChildRemoved: function (snapshot) {
+                    onChildRemoved: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onChildChanged: function (snapshot, previousChildKey) {
+                    onChildChanged: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onChildMoved: function (snapshot, previousChildKey) {
+                    onChildMoved: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onCancelled: function (err) {
+                    onCancelled: (err) => {
                         if (errorCallback) {
                             errorCallback(err);
                         }
@@ -322,30 +315,29 @@ var Firebase = (function (_super) {
                 return this.instance.addChildEventListener(listener);
                 break;
         }
-    };
-    Firebase.prototype.off = function (eventName, callback) {
+    }
+
+    public off(eventName: string, callback: Function): void {
         this.instance.removeEventListener(callback);
-    };
-    Firebase.prototype.set = function (data) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
+    }
+    
+    public set(data: any): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
             var listener = new com.firebase.client.CompletionListener({
-                onComplete: function (err) {
-                    if (err) {
+                onComplete: (err) => {
+                    if(err) {
                         reject(err);
-                    }
-                    else {
+                    } else {
                         resolve(true);
                     }
                 }
             });
-            _this.instance.setValue(Firebase.toHashMap(data), listener);
+            this.instance.setValue(Firebase.toHashMap(data), listener);
         });
-    };
-    Firebase.prototype.child = function (path) {
+    }
+    
+    public child(path: string): IFirebase {
         return new Firebase(this.instance.child(path));
-    };
-    return Firebase;
-})(firebase_common_1.FirebaseCommon);
-exports.__esModule = true;
-exports["default"] = Firebase;
+    }
+}
+
