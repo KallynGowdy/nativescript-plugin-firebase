@@ -1,4 +1,16 @@
-# NativeScript Firebase plugin
+# NativeScript Firebase Common plugin
+
+
+### How this plugin differs from [nativescript-plugin-firebase](https://github.com/EddyVerbruggen/nativescript-plugin-firebase):
+
+This plugin aims to provide a common interface for firebase instances that can be easily used across Android, iOS, and the Web.
+This means that the API surface should be limited as much as possible and should try to mimic the
+detail of the native APIs as much as possible.
+
+As it currently stands, the `nativescript-plugin-firebase` project does not offer an API that is similar to any
+of the Firebase SDK APIs and offers high-level functionality at the expense of composability.
+
+For this project right now, the common API is quite limited, but can easily be expanded to encapsulate additional features.
 
 <img src="screenshots/firebase.png" width="154px" height="43px" alt="Firebase"/><br/>
 The leading realtime database. [Docs here.](https://www.firebase.com/docs/)
