@@ -1,5 +1,11 @@
 import { FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken } from "./firebase-common";
-declare class Firebase extends FirebaseCommon implements IFirebase {
+export declare class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+    private _snap;
+    constructor(snap: any);
+    val(): any;
+    key(): string;
+}
+export declare class Firebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
     static toHashMap(obj: any): any;
     static toJsObject(javaObj: any): any;
@@ -18,4 +24,3 @@ declare class Firebase extends FirebaseCommon implements IFirebase {
     set(data: any): Promise<boolean>;
     child(path: string): IFirebase;
 }
-export = Firebase;

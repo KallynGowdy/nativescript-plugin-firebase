@@ -1,5 +1,11 @@
 import { FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken } from "./firebase-common";
-declare class IosFirebase extends FirebaseCommon implements IFirebase {
+export declare class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+    private _snap;
+    constructor(snap: any);
+    val(): any;
+    key(): string;
+}
+export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
     static toJsObject(objCObj: any): any;
     static getCallbackData(snapshot: any): IFirebaseDataSnapshot;
@@ -17,4 +23,4 @@ declare class IosFirebase extends FirebaseCommon implements IFirebase {
     query(updateCallback: any, path: any, options: any): Promise<{}>;
     remove(path: any): Promise<{}>;
 }
-export = IosFirebase;
+export declare var Firebase: typeof IosFirebase;

@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var firebase_common_1 = require("./firebase-common");
 var types = require("utils/types");
-var IosFirebaseClass = Firebase;
+var IosFirebaseClass = exports.Firebase;
 var IosFirebaseDataSnapshot = (function () {
     function IosFirebaseDataSnapshot(snap) {
         this._snap = snap;
@@ -18,6 +18,7 @@ var IosFirebaseDataSnapshot = (function () {
     };
     return IosFirebaseDataSnapshot;
 })();
+exports.IosFirebaseDataSnapshot = IosFirebaseDataSnapshot;
 var IosFirebase = (function (_super) {
     __extends(IosFirebase, _super);
     function IosFirebase(instance) {
@@ -294,4 +295,5 @@ var IosFirebase = (function (_super) {
     };
     return IosFirebase;
 })(firebase_common_1.FirebaseCommon);
-module.exports = IosFirebase;
+exports.IosFirebase = IosFirebase;
+exports.Firebase = IosFirebase;
