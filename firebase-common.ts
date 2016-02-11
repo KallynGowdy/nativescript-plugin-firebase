@@ -12,12 +12,12 @@ export interface IFirebase {
     /**
      * Listens for events with the given name.
      */
-    on(eventName: string, callback: Function, errCallback: (err: any) => void): Function;
+    on(eventName: string, callback: Function, errCallback: (err: any) => void): IFirebaseEventToken;
     
     /**
-     * Stops listening for events with the given name.
+     * Stops listening for the event that the given token subscribes to.
      */
-    off(eventName: string, callback?: Function): void;
+    off(token: IFirebaseEventToken): void;
     
     /**
      * Returns a new firebase instance that represents the given path beneath this firebase instance.
@@ -39,6 +39,12 @@ export interface IFirebase {
      */
     set(data: any): Promise<boolean>;
 }
+
+/**
+ * Defines a class that represents a token that
+ * represents a subscription to a Firebase event.
+ */
+export interface IFirebaseEventToken {}
 
 export class FirebaseCommon {
 

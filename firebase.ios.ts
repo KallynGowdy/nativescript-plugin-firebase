@@ -1,297 +1,306 @@
-var firebase = require("./firebase-common");
-var types = require("utils/types");
+import * as appModule from "application";
+import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} from "./firebase-common";
+import * as types from "utils/types";
 
-export class Firebase {
-    
+declare var FEventType: any;
+
+var IosFirebaseClass: any = Firebase;
+
+export class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+    private _snap: any;
+
+    constructor(snap) {
+        this._snap = snap;
+    }
+
+    public val(): any {
+        return IosFirebase.toJsObject(this._snap.value);
+    }
+
+    public key(): string {
+        return this._snap.key;
+    }
 }
 
+export class IosFirebase extends FirebaseCommon implements IFirebase {
 
-firebase.toJsObject = function(objCObj) {
-  if (objCObj === null || typeof objCObj != "object") {
-    return objCObj;
-  }
-  var node, key, i, l,
-      oKeyArr = objCObj.allKeys;
-
-  if (oKeyArr === undefined) {
-    // array
-    node = [];
-    for (i = 0, l = objCObj.count; i < l; i++) {
-      key = objCObj.objectAtIndex(i);
-      node.push(firebase.toJsObject(key));
+    constructor(instance: any) {
+        super(instance);
     }
-  } else {
-    // object
-    node = {};
-    for (i = 0, l = oKeyArr.count; i < l; i++) {
-      key = oKeyArr.objectAtIndex(i);
-      var val = objCObj.valueForKey(key);
 
-      switch (types.getClass(val)) {
-        case 'NSMutableArray':
-          node[key] = firebase.toJsObject(val);
-          break;
-        case 'NSMutableDictionary':
-          node[key] = firebase.toJsObject(val);
-          break;
-        case 'String':
-          node[key] = String(val);
-          break;
-        case 'Boolean':
-          node[key] = Boolean(String(val));
-          break;
-        case 'Number':
-          node[key] = Number(String(val));
-          break;
-      }
-    }
-  }
-  return node;
-};
-
-firebase.getCallbackData = function(type, snapshot) {
-  return {
-    type: type,
-    key: snapshot.key,
-    value: firebase.toJsObject(snapshot.value)
-  };
-};
-
-firebase.init = function (arg) {
-  return new Promise(function (resolve, reject) {
-    try {
-      instance = new Firebase(arg.url);
-      resolve(instance);
-    } catch (ex) {
-      console.log("Error in firebase.init: " + ex);
-      reject(ex);
-    }
-  });
-};
-
-firebase.login = function (arg) {
-  return new Promise(function (resolve, reject) {
-    try {
-      var onCompletion = function(error, authData) {
-        if (error) {
-          reject(error.localizedDescription);
-        } else {
-          resolve({
-            uid: authData.uid,
-            provider: authData.provider,
-            expiresAtUnixEpochSeconds: authData.expires,
-            profileImageURL: authData.providerData.objectForKey("profileImageURL"),
-            token: authData.token
-          });
+    public static toJsObject(objCObj) {
+        if (objCObj === null || typeof objCObj != "object") {
+            return objCObj;
         }
-      };
+        var node, key, i, l,
+            oKeyArr = objCObj.allKeys;
 
-      var type = arg.type;
-      if (type === firebase.LoginType.ANONYMOUS) {
-        instance.authAnonymouslyWithCompletionBlock(onCompletion);
-      } else if (type === firebase.LoginType.PASSWORD) {
-        if (!arg.email || !arg.password) {
-          reject("Auth type emailandpassword requires an email and password argument");
+        if (oKeyArr === undefined) {
+            // array
+            node = [];
+            for (i = 0, l = objCObj.count; i < l; i++) {
+                key = objCObj.objectAtIndex(i);
+                node.push(IosFirebase.toJsObject(key));
+            }
         } else {
-          instance.authUserPasswordWithCompletionBlock(arg.email, arg.password, onCompletion);          
+            // object
+            node = {};
+            for (i = 0, l = oKeyArr.count; i < l; i++) {
+                key = oKeyArr.objectAtIndex(i);
+                var val = objCObj.valueForKey(key);
+
+                switch (types.getClass(val)) {
+                    case 'NSMutableArray':
+                        node[key] = IosFirebase.toJsObject(val);
+                        break;
+                    case 'NSMutableDictionary':
+                        node[key] = IosFirebase.toJsObject(val);
+                        break;
+                    case 'String':
+                        node[key] = String(val);
+                        break;
+                    case 'Boolean':
+                        node[key] = Boolean(String(val));
+                        break;
+                    case 'Number':
+                        node[key] = Number(String(val));
+                        break;
+                }
+            }
         }
-      } else {
-        reject ("Unsupported auth type: " + type);
-      }
-    } catch (ex) {
-      console.log("Error in firebase.login: " + ex);
-      reject(ex);
+        return node;
     }
-  });
-};
 
-firebase.createUser = function (arg) {
-  return new Promise(function (resolve, reject) {
-    try {
-      var onCompletion = function(error, authData) {
-        if (error) {
-          reject(error.localizedDescription);
-        } else {
-          resolve(firebase.toJsObject(authData).uid);
-        }
-      };
+    public static getCallbackData(snapshot): IFirebaseDataSnapshot {
+        return new IosFirebaseDataSnapshot(snapshot);
+    };
 
-      if (!arg.email || !arg.password) {
-        reject("Creating a user requires an email and password argument");
-      } else {
-        instance.createUserPasswordWithValueCompletionBlock(arg.email, arg.password, onCompletion);
-      }
-    } catch (ex) {
-      console.log("Error in firebase.createUser: " + ex);
-      reject(ex);
+    public static init(arg: any) {
+        return new Promise(function(resolve, reject) {
+            try {
+                var instance = new IosFirebaseClass(arg.url);
+                resolve(instance);
+            } catch (ex) {
+                console.log("Error in firebase.init: " + ex);
+                reject(ex);
+            }
+        });
     }
-  });
-};
 
-firebase._addObservers = function(to, updateCallback) {
-  to.observeEventTypeWithBlock(FEventType.FEventTypeChildAdded, function (snapshot) {
-    updateCallback(firebase.getCallbackData('ChildAdded', snapshot));
-  });
-  to.observeEventTypeWithBlock(FEventType.FEventTypeChildRemoved, function (snapshot) {
-    updateCallback(firebase.getCallbackData('ChildRemoved', snapshot));
-  });
-  to.observeEventTypeWithBlock(FEventType.FEventTypeChildChanged, function (snapshot) {
-    updateCallback(firebase.getCallbackData('ChildChanged', snapshot));
-  });
-  to.observeEventTypeWithBlock(FEventType.FEventTypeChildMoved, function (snapshot) {
-    updateCallback(firebase.getCallbackData('ChildMoved', snapshot));
-  });
-};
+    public login(arg) {
+        return new Promise(function(resolve, reject) {
+            try {
+                var onCompletion = function(error, authData) {
+                    if (error) {
+                        reject(error.localizedDescription);
+                    } else {
+                        resolve({
+                            uid: authData.uid,
+                            provider: authData.provider,
+                            expiresAtUnixEpochSeconds: authData.expires,
+                            profileImageURL: authData.providerData.objectForKey("profileImageURL"),
+                            token: authData.token
+                        });
+                    }
+                };
 
-firebase.addChildEventListener = function (updateCallback, path) {
-  return new Promise(function (resolve, reject) {
-    try {
-      var where = instance;
-      if (path !== undefined) {
-        where = instance.childByAppendingPath(path);
-      }
-      firebase._addObservers(where, updateCallback);
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.addChildEventListener: " + ex);
-      reject(ex);
+                var type = arg.type;
+                if (type === FirebaseCommon.LoginType.ANONYMOUS) {
+                    this.instance.authAnonymouslyWithCompletionBlock(onCompletion);
+                } else if (type === FirebaseCommon.LoginType.PASSWORD) {
+                    if (!arg.email || !arg.password) {
+                        reject("Auth type emailandpassword requires an email and password argument");
+                    } else {
+                        this.instance.authUserPasswordWithCompletionBlock(arg.email, arg.password, onCompletion);
+                    }
+                } else {
+                    reject("Unsupported auth type: " + type);
+                }
+            } catch (ex) {
+                console.log("Error in firebase.login: " + ex);
+                reject(ex);
+            }
+        });
     }
-  });
-};
 
-firebase.addValueEventListener = function (updateCallback, path) {
-  return new Promise(function (resolve, reject) {
-    try {
-      var where = instance;
-      if (path !== undefined) {
-        where = instance.childByAppendingPath(path);
-      }
-      where.observeEventTypeWithBlockWithCancelBlock(
-          FEventType.FEventTypeValue,
-          function (snapshot) {
-            updateCallback(firebase.getCallbackData('ValueChanged', snapshot));
-          },
-          function (firebaseError) {
-            updateCallback({
-              error: firebaseError.localizedDescription
+    public createUser(arg) {
+        return new Promise(function(resolve, reject) {
+            try {
+                var onCompletion = function(error, authData) {
+                    if (error) {
+                        reject(error.localizedDescription);
+                    } else {
+                        resolve(IosFirebase.toJsObject(authData).uid);
+                    }
+                };
+
+                if (!arg.email || !arg.password) {
+                    reject("Creating a user requires an email and password argument");
+                } else {
+                    this.instance.createUserPasswordWithValueCompletionBlock(arg.email, arg.password, onCompletion);
+                }
+            } catch (ex) {
+                console.log("Error in firebase.createUser: " + ex);
+                reject(ex);
+            }
+        });
+    }
+
+    public push(data: any): Promise<boolean> {
+        return new IosFirebase(this.instance.childByAutoId()).set(data);
+    }
+
+    public set(data: any): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            this.instance.setValueWithCompletionBlock(data, (err: any, ref: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
             });
-          });
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.addChildEventListener: " + ex);
-      reject(ex);
+        });
     }
-  });
-};
 
-firebase.push = function (path, val) {
-  return new Promise(function (resolve, reject) {
-    try {
-      instance.childByAppendingPath(path).childByAutoId().setValue(val);
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.push: " + ex);
-      reject(ex);
+    public child(path: string): IFirebase {
+        return new IosFirebase(this.instance.childByAppendingPath(path));
     }
-  });
-};
 
-firebase.setValue = function (path, val) {
-  return new Promise(function (resolve, reject) {
-    try {
-      instance.childByAppendingPath(path).setValue(val);
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.setValue: " + ex);
-      reject(ex);
+    public on(eventName: string, callback: Function, errorCallback?: (err: any) => void): IFirebaseEventToken {
+        var eventType: any;
+
+        switch (eventName) {
+            case "value":
+                eventType = FEventType.FEventTypeValue;
+                break;
+            case "child_added":
+                eventType = FEventType.FEventTypeChildAdded;
+                break;
+            case "child_removed":
+                eventType = FEventType.FEventTypeChildRemoved;
+                break;
+            case "child_changed":
+                eventType = FEventType.FEventTypeChildChanged;
+                break;
+            case "child_moved":
+                eventType = FEventType.FEventTypeChildMoved;
+                break;
+        }
+
+        return this.instance.observeEventTypeWithBlockWithCancelBlock(
+            eventType,
+            (snap: any) => {
+                callback(IosFirebase.getCallbackData(snap));
+            },
+            (err: any) => {
+                if(errorCallback) {
+                    errorCallback(err);
+                }
+            }
+        );
     }
-  });
-};
 
-firebase.query = function (updateCallback, path, options) {
-  return new Promise(function (resolve, reject) {
-    try {
+    public off(token: IFirebaseEventToken): void {
+        this.instance.removeObserverWithHandle(token);
+    }
 
-      var where = instance;
-      if (path !== undefined) {
-        where = instance.childByAppendingPath(path);
-      }
+    public setValue(path, val) {
+        return new Promise(function(resolve, reject) {
+            try {
+                this.instance.childByAppendingPath(path).setValue(val);
+                resolve();
+            } catch (ex) {
+                console.log("Error in firebase.setValue: " + ex);
+                reject(ex);
+            }
+        });
+    }
 
-      var query;
+    public query(updateCallback, path, options) {
+        return new Promise(function(resolve, reject) {
+            try {
+
+                var where = this.instance;
+                if (path !== undefined) {
+                    where = this.instance.childByAppendingPath(path);
+                }
+
+                var query;
       
-      // orderBy
-      if (options.orderBy.type === firebase.QueryOrderByType.KEY) {
-        query = where.queryOrderedByKey();
-      } else if (options.orderBy.type === firebase.QueryOrderByType.VALUE) {
-        query = where.queryOrderedByValue();
-      } else if (options.orderBy.type === firebase.QueryOrderByType.PRIORITY) {
-        query = where.queryOrderedByPriority();
-      } else if (options.orderBy.type === firebase.QueryOrderByType.CHILD) {
-        if (!options.orderBy.value) {
-          reject("When orderBy.type is 'child' you must set orderBy.value as well.");
-          return;
-        }
-        query = where.queryOrderedByChild(options.orderBy.value);
-      } else {
-        reject("Invalid orderBy.type, use constants like firebase.QueryOrderByType.VALUE");
-        return;
-      }
+                // orderBy
+                if (options.orderBy.type === FirebaseCommon.QueryOrderByType.KEY) {
+                    query = where.queryOrderedByKey();
+                } else if (options.orderBy.type === FirebaseCommon.QueryOrderByType.VALUE) {
+                    query = where.queryOrderedByValue();
+                } else if (options.orderBy.type === FirebaseCommon.QueryOrderByType.PRIORITY) {
+                    query = where.queryOrderedByPriority();
+                } else if (options.orderBy.type === FirebaseCommon.QueryOrderByType.CHILD) {
+                    if (!options.orderBy.value) {
+                        reject("When orderBy.type is 'child' you must set orderBy.value as well.");
+                        return;
+                    }
+                    query = where.queryOrderedByChild(options.orderBy.value);
+                } else {
+                    reject("Invalid orderBy.type, use constants like firebase.QueryOrderByType.VALUE");
+                    return;
+                }
 
-      // range
-      if (options.range && options.range.type) {
-        if (!options.range.value) {
-          reject("Please set range.value");
-          return;
-        }
-        if (options.range.type === firebase.QueryRangeType.START_AT) {
-          query = query.queryStartingAtValue(options.range.value);
-        } else if (options.range.type === firebase.QueryRangeType.END_AT) {
-          console.log("----- ending at: " + options.range.value);
-          query = query.queryEndingAtValue(options.range.value);
-        } else if (options.range.type === firebase.QueryRangeType.EQUAL_TO) {
-          query = query.queryEqualToValue(options.range.value);
-        } else {
-          reject("Invalid range.type, use constants like firebase.QueryRangeType.START_AT");
-          return;
-        }
-      }
+                // range
+                if (options.range && options.range.type) {
+                    if (!options.range.value) {
+                        reject("Please set range.value");
+                        return;
+                    }
+                    if (options.range.type === FirebaseCommon.QueryRangeType.START_AT) {
+                        query = query.queryStartingAtValue(options.range.value);
+                    } else if (options.range.type === FirebaseCommon.QueryRangeType.END_AT) {
+                        console.log("----- ending at: " + options.range.value);
+                        query = query.queryEndingAtValue(options.range.value);
+                    } else if (options.range.type === FirebaseCommon.QueryRangeType.EQUAL_TO) {
+                        query = query.queryEqualToValue(options.range.value);
+                    } else {
+                        reject("Invalid range.type, use constants like firebase.QueryRangeType.START_AT");
+                        return;
+                    }
+                }
 
-      // limit
-      if (options.limit && options.limit.type) {
-        if (!options.limit.value) {
-          reject("Please set limit.value");
-          return;
-        }
-        if (options.limit.type === firebase.QueryLimitType.FIRST) {
-          query = query.queryLimitedToFirst(options.limit.value);
-        } else if (options.limit.type === firebase.QueryLimitType.LAST) {
-          console.log("---- LAST");
-          query = query.queryLimitedToLast(options.limit.value);
-        } else {
-          reject("Invalid limit.type, use constants like firebase.queryOptions.limitType.FIRST");
-          return;
-        }
-      }
+                // limit
+                if (options.limit && options.limit.type) {
+                    if (!options.limit.value) {
+                        reject("Please set limit.value");
+                        return;
+                    }
+                    if (options.limit.type === FirebaseCommon.QueryLimitType.FIRST) {
+                        query = query.queryLimitedToFirst(options.limit.value);
+                    } else if (options.limit.type === FirebaseCommon.QueryLimitType.LAST) {
+                        console.log("---- LAST");
+                        query = query.queryLimitedToLast(options.limit.value);
+                    } else {
+                        reject("Invalid limit.type, use constants like firebase.queryOptions.limitType.FIRST");
+                        return;
+                    }
+                }
 
-      firebase._addObservers(query, updateCallback);
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.query: " + ex);
-      reject(ex);
+                //IosFirebase._addObservers(query, updateCallback);
+                resolve();
+            } catch (ex) {
+                console.log("Error in firebase.query: " + ex);
+                reject(ex);
+            }
+        });
     }
-  });
-};
 
-firebase.remove = function (path) {
-  return new Promise(function (resolve, reject) {
-    try {
-      instance.childByAppendingPath(path).setValue(null);
-      resolve();
-    } catch (ex) {
-      console.log("Error in firebase.remove: " + ex);
-      reject(ex);
+    public remove(path) {
+        return new Promise(function(resolve, reject) {
+            try {
+                this.instance.childByAppendingPath(path).setValue(null);
+                resolve();
+            } catch (ex) {
+                console.log("Error in firebase.remove: " + ex);
+                reject(ex);
+            }
+        });
     }
-  });
-};
+}
 
-module.exports = firebase;
+export var Firebase = IosFirebase;

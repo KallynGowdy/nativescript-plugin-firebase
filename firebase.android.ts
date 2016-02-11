@@ -1,14 +1,11 @@
 import * as appModule from "application";
-import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot} from "./firebase-common";
+import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} from "./firebase-common";
 
 declare var java: any;
 declare var com;
 
 export class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
-
     private _snap: any;
-    private _value: any;
-    private _key: string;
 
     constructor(snap) {
         this._snap = snap;
@@ -267,65 +264,75 @@ export default class Firebase extends FirebaseCommon implements IFirebase {
     };
 
     public remove(key?: string): Promise<boolean> {
-        if(key) {
+        if (key) {
             return this.child(key).set(null);
         } else {
             return this.set(null);
         }
     };
 
-    public on(eventName: string, callback: Function, errorCallback?: (err: any) => void): Function {
+    public on(eventName: string, callback: Function, errorCallback?: (err: any) => void): IFirebaseEventToken {
+
+        var cancelledCallback = (err) => {
+            if (errorCallback) {
+                errorCallback(err);
+            }
+        };
         switch (eventName) {
             case "value":
                 var eventListener = new com.firebase.client.ValueEventListener({
                     onDataChange: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onCancelled: (err) => {
-                        if (errorCallback) {
-                            errorCallback(err);
-                        }
-                    }
+                    onCancelled: cancelledCallback
                 });
                 return this.instance.addValueEventListener(eventListener);
                 break;
             case "child_added":
-            case "child_changed":
-            case "child_removed":
-            case "child_moved":
                 var listener = new com.firebase.client.ChildEventListener({
                     onChildAdded: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_changed":
+                var listener = new com.firebase.client.ChildEventListener({
                     onChildRemoved: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onChildChanged: (snapshot, previousChildKey) => {
-                        callback(Firebase.getCallbackData(snapshot), previousChildKey);
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_removed":
+                var listener = new com.firebase.client.ChildEventListener({
+                    onChildRemoved: (snapshot) => {
+                        callback(Firebase.getCallbackData(snapshot));
                     },
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_moved":
+                var listener = new com.firebase.client.ChildEventListener({
                     onChildMoved: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onCancelled: (err) => {
-                        if (errorCallback) {
-                            errorCallback(err);
-                        }
-                    }
+                    onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
                 break;
         }
     }
 
-    public off(eventName: string, callback: Function): void {
-        this.instance.removeEventListener(callback);
+    public off(token: IFirebaseEventToken): void {
+        this.instance.removeEventListener(token);
     }
-    
+
     public set(data: any): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             var listener = new com.firebase.client.CompletionListener({
                 onComplete: (err) => {
-                    if(err) {
+                    if (err) {
                         reject(err);
                     } else {
                         resolve(true);
@@ -335,7 +342,7 @@ export default class Firebase extends FirebaseCommon implements IFirebase {
             this.instance.setValue(Firebase.toHashMap(data), listener);
         });
     }
-    
+
     public child(path: string): IFirebase {
         return new Firebase(this.instance.child(path));
     }
