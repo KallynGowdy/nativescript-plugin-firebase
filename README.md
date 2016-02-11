@@ -28,7 +28,7 @@ like `https://resplendent-fire-4211.firebaseio.com/`.
 ## Installation
 From the command prompt go to your app's root folder and execute:
 ```
-tns plugin add nativescript-plugin-firebase
+tns plugin add nativescript-plugin-firebase-common
 ```
 
 ## Usage
