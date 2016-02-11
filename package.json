@@ -1,30 +1,40 @@
 {
-  "name": "nativescript-plugin-firebase",
-  "version": "2.0.0",
-  "description" : "Fire. Base. Firebase!",
-  "main" : "firebase.js",
-  "nativescript": {
-    "platforms": {
-      "android": "1.3.0",
-      "ios": "1.3.0"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase.git"
-  },
-  "keywords": [
-    "NativeScript",
-    "Firebase",
-    "Database"
-  ],
-  "author": "Telerik / Eddy Verbruggen <eddyverbruggen@gmail.com>",
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase/blob/master/LICENSE"
-  },
-  "bugs": {
-    "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase/issues"
-  },
-  "homepage": "https://github.com/eddyverbruggen/nativescript-plugin-firebase"
+    "name": "nativescript-plugin-firebase-common",
+    "version": "2.0.0",
+    "description": "Fire. Base. Firebase!",
+    "main": "firebase.js",
+    "nativescript": {
+        "platforms": {
+            "android": "1.3.0",
+            "ios": "1.3.0"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase.git"
+    },
+    "keywords": [
+        "NativeScript",
+        "Firebase",
+        "Database"
+    ],
+    "author": "Telerik / Eddy Verbruggen <eddyverbruggen@gmail.com>",
+    "contributors": [
+        {
+            "name": "Eddy Verbruggen",
+            "email": "eddyverbruggen@gmail.com"
+        },
+        {
+            "name": "Kallyn Gowdy",
+            "email": "kallyngowdy@gmail.com"
+        }
+    ],
+    "license": {
+        "type": "MIT",
+        "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase/blob/master/LICENSE"
+    },
+    "bugs": {
+        "url": "https://github.com/eddyverbruggen/nativescript-plugin-firebase/issues"
+    },
+    "homepage": "https://github.com/eddyverbruggen/nativescript-plugin-firebase"
 }
