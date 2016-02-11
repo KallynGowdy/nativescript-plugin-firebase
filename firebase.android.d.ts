@@ -10,9 +10,9 @@ export declare class Firebase extends FirebaseCommon implements IFirebase {
     static toHashMap(obj: any): any;
     static toJsObject(javaObj: any): any;
     static getCallbackData(snapshot: any): IFirebaseDataSnapshot;
-    static init(arg: {
+    static createNew(arg: {
         url: string;
-    }): Promise<{}>;
+    }): IFirebase;
     login(arg: any): Promise<{}>;
     createUser(arg: any): Promise<any>;
     push(data: any): Promise<boolean>;

@@ -99,20 +99,11 @@ var Firebase = (function (_super) {
         return new AndroidFirebaseDataSnapshot(snapshot);
     };
     ;
-    Firebase.init = function (arg) {
-        return new Promise(function (resolve, reject) {
-            try {
-                var JavaFirebase = com.firebase.client.Firebase;
-                JavaFirebase.setAndroidContext(appModule.android.context);
-                var instance = new JavaFirebase(arg.url);
-                var firebase = new Firebase(instance);
-                resolve(firebase);
-            }
-            catch (ex) {
-                console.log("Error in firebase.init: " + ex);
-                reject(ex);
-            }
-        });
+    Firebase.createNew = function (arg) {
+        var JavaFirebase = com.firebase.client.Firebase;
+        JavaFirebase.setAndroidContext(appModule.android.context);
+        var instance = new JavaFirebase(arg.url);
+        return new Firebase(instance);
     };
     ;
     Firebase.prototype.login = function (arg) {

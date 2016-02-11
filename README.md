@@ -33,20 +33,13 @@ tns plugin add nativescript-plugin-firebase-common
 
 ## Usage
 
-### init
+### createNew
 ```js
-  var firebase = require("nativescript-plugin-firebase-common");
+  var Firebase = require("nativescript-plugin-firebase-common").Firebase;
 
-  firebase.init({
+  var firebase = Firebase.createNew({
     url: 'https://resplendent-fire-4211.firebaseio.com'
-  }).then(
-      function (instance) {
-        console.log("firebase.init done");
-      },
-      function (error) {
-        console.log("firebase.init error: " + error);
-      }
-  );
+  });
 ```
 
 All further examples assume `firebase` has been required.

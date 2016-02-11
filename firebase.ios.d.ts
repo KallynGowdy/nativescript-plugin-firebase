@@ -9,9 +9,9 @@ export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
     static toJsObject(objCObj: any): any;
     static getCallbackData(snapshot: any): IFirebaseDataSnapshot;
-    static init(arg: {
+    static createNew(arg: {
         url: string;
-    }): Promise<{}>;
+    }): IFirebase;
     login(arg: any): Promise<{}>;
     createUser(arg: any): Promise<{}>;
     push(data: any): Promise<boolean>;

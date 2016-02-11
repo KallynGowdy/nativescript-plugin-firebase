@@ -75,16 +75,8 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         return new IosFirebaseDataSnapshot(snapshot);
     };
 
-    public static init(arg: { url: string }) {
-        return new Promise(function(resolve, reject) {
-            try {
-                var instance = new IosFirebaseClass(arg.url);
-                resolve(instance);
-            } catch (ex) {
-                console.log("Error in firebase.init: " + ex);
-                reject(ex);
-            }
-        });
+    public static createNew(arg: { url: string }): IFirebase {
+        return new IosFirebaseClass(arg.url);
     }
 
     public login(arg) {

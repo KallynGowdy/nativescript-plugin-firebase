@@ -68,17 +68,8 @@ var IosFirebase = (function (_super) {
         return new IosFirebaseDataSnapshot(snapshot);
     };
     ;
-    IosFirebase.init = function (arg) {
-        return new Promise(function (resolve, reject) {
-            try {
-                var instance = new IosFirebaseClass(arg.url);
-                resolve(instance);
-            }
-            catch (ex) {
-                console.log("Error in firebase.init: " + ex);
-                reject(ex);
-            }
-        });
+    IosFirebase.createNew = function (arg) {
+        return new IosFirebaseClass(arg.url);
     };
     IosFirebase.prototype.login = function (arg) {
         return new Promise(function (resolve, reject) {
