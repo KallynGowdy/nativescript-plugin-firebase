@@ -75,7 +75,7 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         return new IosFirebaseDataSnapshot(snapshot);
     };
 
-    public static init(arg: any) {
+    public static init(arg: { url: string }) {
         return new Promise(function(resolve, reject) {
             try {
                 var instance = new IosFirebaseClass(arg.url);
@@ -193,7 +193,7 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
                 callback(IosFirebase.getCallbackData(snap));
             },
             (err: any) => {
-                if(errorCallback) {
+                if (errorCallback) {
                     errorCallback(err);
                 }
             }

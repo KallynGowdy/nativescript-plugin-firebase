@@ -103,7 +103,7 @@ export default class Firebase extends FirebaseCommon implements IFirebase {
         return new AndroidFirebaseDataSnapshot(snapshot);
     };
 
-    public static init(arg: any) {
+    public static init(arg: { url: string }) {
         return new Promise((resolve, reject) => {
             try {
                 var JavaFirebase = com.firebase.client.Firebase;

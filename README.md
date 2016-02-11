@@ -12,14 +12,6 @@ of the Firebase SDK APIs and offers high-level functionality at the expense of c
 
 For this project right now, the common API is quite limited, but can easily be expanded to encapsulate additional features.
 
-<img src="screenshots/firebase.png" width="154px" height="43px" alt="Firebase"/><br/>
-The leading realtime database. [Docs here.](https://www.firebase.com/docs/)
-
-
-
-If you can spare 41 seconds, please check this video of the [demo app](https://github.com/EddyVerbruggen/nativescript-plugin-firebase-demo) in action:
-[![YouTube demo, 41 sec](screenshots/yt-thumb.png)](https://youtu.be/7zYU5e0Djkw "YouTube demo, 41 sec")
-
 ### Use when
 * you need to store JSON data in the cloud,
 * you want to sync that data to other devices and platforms,
@@ -41,12 +33,9 @@ tns plugin add nativescript-plugin-firebase
 
 ## Usage
 
-If you want a quickstart, [clone our demo app (the one in the YouTube video)](https://github.com/EddyVerbruggen/nativescript-plugin-firebase-demo).
-And here's the comprehensive list of supported functions:
-
 ### init
 ```js
-  var firebase = require("nativescript-plugin-firebase");
+  var firebase = require("nativescript-plugin-firebase-common");
 
   firebase.init({
     url: 'https://resplendent-fire-4211.firebaseio.com'
@@ -61,25 +50,27 @@ And here's the comprehensive list of supported functions:
 ```
 
 All further examples assume `firebase` has been required.
-Also, all functions support promises, but we're leaving out the `.then()` stuff for brevity where it doesn't add value.
 
-### setValue
-Data is stored as JSON data at a specific path (which is appended to the URL you passed to `init`).
-If you want to add data to a known path use this, otherwise use `push` (see below).
+### child
+Gets a firebase reference for the location at the specified relative path.
 
-The plugin will take care of serializing JSON data to native data structures.
+```js
+    var categories = firebase.child("categories");
+```
+
+### set
+Replaces the data at the current firebase location. 
+Analogous to [`set()` in the Firebase JavaScript SDK](https://www.firebase.com/docs/web/api/firebase/set.html).
 
 ```js
 
   // to store a JSON object
-  firebase.setValue(
-      '/companies',
+  var promise = firebase.set(
       {'foo':'bar'}
   );
 
   // to store an array of JSON objects
-  firebase.setValue(
-      '/companies',
+  var otherPromise = firebase.set(
       [
         {name: 'Telerik', country: 'Bulgaria'},
         {name: 'Google', country: 'USA'}
@@ -88,11 +79,10 @@ The plugin will take care of serializing JSON data to native data structures.
 ```
 
 ### push
-This function will store a JSON object at path `<Firebase URL>/users/<Generated Key>`
+This function will store the given object as a new child at the current location:
 
 ```js
-  firebase.push(
-      '/users',
+  var promise = firebase.push(
       {
         'first': 'Eddy',
         'last': 'Verbruggen',
@@ -106,87 +96,41 @@ This function will store a JSON object at path `<Firebase URL>/users/<Generated 
   );
 ```
 
-### query
-Firebase supports querying data and this plugin does too, since v2.0.0.
-
-Let's say we have the structure as defined at `setValue`, then use this query to retrieve the companies in country 'Bulgaria':
-
-```js
-    var onQueryEvent = function(result) {
-        // note that the query returns 1 match at a time
-        // in the order specified in the query
-        if (!result.error) {
-            console.log("Event type: " + result.type);
-            console.log("Key: " + result.key);
-            console.log("Value: " + JSON.stringify(result.value));
-        }
-    };
-
-    firebase.query(
-        onQueryEvent,
-        "/companies",
-        {
-            // order by company.country
-            orderBy: {
-                type: firebase.QueryOrderByType.CHILD,
-                value: 'country' // mandatory when type is 'child'
-            },
-            // but only companies named 'Telerik'
-            // (this range relates to the orderBy clause)
-            range: {
-                type: firebase.QueryRangeType.EQUAL_TO,
-                value: 'Bulgaria'
-            },
-            // only the first 2 matches
-            // (note that there's only 1 in this case anyway)
-            limit: {
-                type: firebase.QueryLimitType.LAST,
-                value: 2
-            }
-        }
-    );
-```
-
-For supported values of the orderBy/range/limit's `type` properties, take a look at the [`firebase-common.d.ts`](firebase-common.d.ts) TypeScript definitions in this repo.
-
-### addChildEventListener
+### on
 To listen for changes in your database you can pass in a listener callback function.
-You get to control which path inside you database you want to listen to, by default it's `/` which is the entire database.
+The possible event types are:
+
+- `value`, Observes the value for the firebase ref.
+- `child_added`, Observes when a new child is added to the firebase ref.
+- `child_changed`, Observes when a child was modified in the firebase ref.
+- `child_moved`, Observes when a child was moved in the firebase ref.
+- `child_removed`, Observes when a child was removed from the firebase ref.
 
 The plugin will take care of serializing native data structures to JSON data.
 
 ```js
-  var onChildEvent = function(result) {
-    console.log("Event type: " + result.type);
-    console.log("Key: " + result.key);
-    console.log("Value: " + JSON.stringify(result.value));
+  var onChildAdded = function(result) {
+    console.log("Key: " + result.key());
+    console.log("Value: " + JSON.stringify(result.val()));
   };
 
-  // listen to changes in the /users path
-  firebase.addChildEventListener(onChildEvent, "/users");
+  var users = firebase.child("users");
+
+  // listen to new "children" in the /users path
+  var cancellationToken = users.on("child_added", onChildAdded);
+  
+  // to disable the event listener:
+  users.off("child_added", cancellationToken);
 ```
 
-### addValueEventListener
-The difference with `addChildEventListener` is [explained here](https://www.firebase.com/docs/ios/guide/retrieving-data.html).
-The link is for the iOS SDK, but it's the same for Android.
-
-```js
-  var onValueEvent = function(result) {
-    console.log("Event type: " + result.type);
-    console.log("Key: " + result.key);
-    console.log("Value: " + JSON.stringify(result.value));
-  };
-
-  // listen to changes in the /companies path
-  firebase.addValueEventListener(onValueEvent, "/companies");
-```
+This method and the related `off()` method have been designed to be analogous to the [Firebase JavaScript SDK](https://www.firebase.com/docs/web/api/query/on.html) versions.
 
 ### remove
-You can remove the entire database content by passing in '/' as param,
-but if you only want to wipe everything at '/users', do this:
+You can remove the entire database content by omitting the param,
+but if you only want to wipe everything at `'/users'`, do this:
 
 ```js
-  firebase.remove("/users");
+  var promise = firebase.remove("/users");
 ```
 
 ### login
@@ -258,25 +202,6 @@ Shouldn't be more complicated than:
 ```js
   firebase.logout();
 ```
-
-## Pro tips
-
-### See what's happening
-It's kinda cool to manipulate data while using multiple devices or your device and the Firebase Dashboard. You will instantly see the update on the other end.
-The Firebase Dashboard can be reached by simply loading your Firebase URL in a web browser.
-
-### Testing your app in the emulator
-
-`tns emulate ios --device iPhone-6s`
-
-`tns emulate android --geny "Nexus 6_23"`
-
-or start a geny emulator first and do: `tns run android`
-
-## Future work
-- Add support for `removeEventListener`.
-- Possibly add more login mechanisms.
-
 
 ## Credits
 The starting point for this plugin was [this great Gist](https://gist.github.com/jbristowe/c89a7bcae7fc9a035ee7) by [John Bristowe](https://github.com/jbristowe).
