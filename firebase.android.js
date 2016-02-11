@@ -17,7 +17,6 @@ var AndroidFirebaseDataSnapshot = (function () {
     };
     return AndroidFirebaseDataSnapshot;
 })();
-exports.AndroidFirebaseDataSnapshot = AndroidFirebaseDataSnapshot;
 var Firebase = (function (_super) {
     __extends(Firebase, _super);
     function Firebase(instance) {
@@ -356,5 +355,4 @@ var Firebase = (function (_super) {
     };
     return Firebase;
 })(firebase_common_1.FirebaseCommon);
-exports.__esModule = true;
-exports["default"] = Firebase;
+module.exports = Firebase;

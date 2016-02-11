@@ -4,7 +4,7 @@ import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} f
 declare var java: any;
 declare var com;
 
-export class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     private _snap: any;
 
     constructor(snap) {
@@ -20,7 +20,7 @@ export class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     }
 }
 
-export default class Firebase extends FirebaseCommon implements IFirebase {
+class Firebase extends FirebaseCommon implements IFirebase {
 
     constructor(instance: any) {
         super(instance);
@@ -348,3 +348,4 @@ export default class Firebase extends FirebaseCommon implements IFirebase {
     }
 }
 
+export = Firebase;

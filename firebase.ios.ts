@@ -3,10 +3,11 @@ import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} f
 import * as types from "utils/types";
 
 declare var FEventType: any;
+declare var Firebase: any;
 
 var IosFirebaseClass: any = Firebase;
 
-export class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
+class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     private _snap: any;
 
     constructor(snap) {
@@ -22,7 +23,7 @@ export class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     }
 }
 
-export class IosFirebase extends FirebaseCommon implements IFirebase {
+class IosFirebase extends FirebaseCommon implements IFirebase {
 
     constructor(instance: any) {
         super(instance);
@@ -303,4 +304,4 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
     }
 }
 
-export var Firebase = IosFirebase;
+export = IosFirebase;
