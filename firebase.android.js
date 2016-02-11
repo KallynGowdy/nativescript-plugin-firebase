@@ -30,7 +30,7 @@ var Firebase = (function (_super) {
                 if (obj[property] !== null) {
                     switch (typeof obj[property]) {
                         case 'object':
-                            node.put(property, firebase.toHashMap(obj[property], node));
+                            node.put(property, Firebase.toHashMap(obj[property]));
                             break;
                         case 'boolean':
                             node.put(property, java.lang.Boolean.valueOf(String(obj[property])));
@@ -65,7 +65,7 @@ var Firebase = (function (_super) {
             case 'java.util.ArrayList':
                 node = [];
                 for (var i = 0; i < javaObj.size(); i++) {
-                    node[i] = firebase.toJsObject(javaObj.get(i));
+                    node[i] = Firebase.toJsObject(javaObj.get(i));
                 }
                 break;
             default:
@@ -75,7 +75,7 @@ var Firebase = (function (_super) {
                     var item = iterator.next();
                     switch (item.getClass().getName()) {
                         case 'java.util.HashMap$HashMapEntry':
-                            node[item.getKey()] = firebase.toJsObject(item.getValue());
+                            node[item.getKey()] = Firebase.toJsObject(item.getValue());
                             break;
                         case 'java.lang.String':
                             node[item.getKey()] = String(item.getValue());
@@ -133,10 +133,10 @@ var Firebase = (function (_super) {
                     }
                 });
                 var type = arg.type;
-                if (type === firebase.LoginType.ANONYMOUS) {
+                if (type === firebase_common_1.FirebaseCommon.LoginType.ANONYMOUS) {
                     this.instance.authAnonymously(authorizer);
                 }
-                else if (type === firebase.LoginType.PASSWORD) {
+                else if (type === Firebase.LoginType.PASSWORD) {
                     if (!arg.email || !arg.password) {
                         reject("Auth type emailandpassword requires an email and password argument");
                     }
@@ -162,7 +162,7 @@ var Firebase = (function (_super) {
                 var valueResultHandler = new com.firebase.client.Firebase.ValueResultHandler({
                     onSuccess: function (authData) {
                         console.log("--- created: " + authData);
-                        resolve(firebase.toJsObject(authData).uid);
+                        resolve(Firebase.toJsObject(authData).uid);
                     },
                     onError: function (firebaseError) {
                         reject(firebaseError.getMessage());
@@ -205,16 +205,16 @@ var Firebase = (function (_super) {
             try {
                 var query;
                 // orderBy
-                if (options.orderBy.type === firebase.QueryOrderByType.KEY) {
+                if (options.orderBy.type === Firebase.QueryOrderByType.KEY) {
                     query = this.instance.child(path).orderByKey();
                 }
-                else if (options.orderBy.type === firebase.QueryOrderByType.VALUE) {
+                else if (options.orderBy.type === Firebase.QueryOrderByType.VALUE) {
                     query = this.instance.child(path).orderByValue();
                 }
-                else if (options.orderBy.type === firebase.QueryOrderByType.PRIORITY) {
+                else if (options.orderBy.type === Firebase.QueryOrderByType.PRIORITY) {
                     query = this.instance.child(path).orderByPriority();
                 }
-                else if (options.orderBy.type === firebase.QueryOrderByType.CHILD) {
+                else if (options.orderBy.type === Firebase.QueryOrderByType.CHILD) {
                     if (!options.orderBy.value) {
                         reject("When orderBy.type is 'child' you must set orderBy.value as well.");
                         return;
@@ -231,13 +231,13 @@ var Firebase = (function (_super) {
                         reject("Please set range.value");
                         return;
                     }
-                    if (options.range.type === firebase.QueryRangeType.START_AT) {
+                    if (options.range.type === Firebase.QueryRangeType.START_AT) {
                         query = query.startAt(options.range.value);
                     }
-                    else if (options.range.type === firebase.QueryRangeType.END_AT) {
+                    else if (options.range.type === Firebase.QueryRangeType.END_AT) {
                         query = query.endAt(options.range.value);
                     }
-                    else if (options.range.type === firebase.QueryRangeType.EQUAL_TO) {
+                    else if (options.range.type === Firebase.QueryRangeType.EQUAL_TO) {
                         query = query.equalTo(options.range.value);
                     }
                     else {
@@ -251,10 +251,10 @@ var Firebase = (function (_super) {
                         reject("Please set limit.value");
                         return;
                     }
-                    if (options.limit.type === firebase.QueryLimitType.FIRST) {
+                    if (options.limit.type === Firebase.QueryLimitType.FIRST) {
                         query = query.limitToFirst(options.limit.value);
                     }
-                    else if (options.limit.type === firebase.QueryLimitType.LAST) {
+                    else if (options.limit.type === Firebase.QueryLimitType.LAST) {
                         query = query.limitToLast(options.limit.value);
                     }
                     else {
@@ -262,7 +262,7 @@ var Firebase = (function (_super) {
                         return;
                     }
                 }
-                firebase._addObservers(query, updateCallback);
+                this._addObservers(query, updateCallback);
                 resolve();
             }
             catch (ex) {
@@ -282,49 +282,58 @@ var Firebase = (function (_super) {
     };
     ;
     Firebase.prototype.on = function (eventName, callback, errorCallback) {
+        var cancelledCallback = function (err) {
+            if (errorCallback) {
+                errorCallback(err);
+            }
+        };
         switch (eventName) {
             case "value":
                 var eventListener = new com.firebase.client.ValueEventListener({
                     onDataChange: function (snapshot) {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onCancelled: function (err) {
-                        if (errorCallback) {
-                            errorCallback(err);
-                        }
-                    }
+                    onCancelled: cancelledCallback
                 });
                 return this.instance.addValueEventListener(eventListener);
                 break;
             case "child_added":
-            case "child_changed":
-            case "child_removed":
-            case "child_moved":
                 var listener = new com.firebase.client.ChildEventListener({
                     onChildAdded: function (snapshot, previousChildKey) {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_changed":
+                var listener = new com.firebase.client.ChildEventListener({
                     onChildRemoved: function (snapshot) {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onChildChanged: function (snapshot, previousChildKey) {
-                        callback(Firebase.getCallbackData(snapshot), previousChildKey);
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_removed":
+                var listener = new com.firebase.client.ChildEventListener({
+                    onChildRemoved: function (snapshot) {
+                        callback(Firebase.getCallbackData(snapshot));
                     },
+                    onCancelled: cancelledCallback
+                });
+                return this.instance.addChildEventListener(listener);
+            case "child_moved":
+                var listener = new com.firebase.client.ChildEventListener({
                     onChildMoved: function (snapshot, previousChildKey) {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onCancelled: function (err) {
-                        if (errorCallback) {
-                            errorCallback(err);
-                        }
-                    }
+                    onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
                 break;
         }
     };
-    Firebase.prototype.off = function (eventName, callback) {
-        this.instance.removeEventListener(callback);
+    Firebase.prototype.off = function (eventName, token) {
+        this.instance.removeEventListener(token);
     };
     Firebase.prototype.set = function (data) {
         var _this = this;

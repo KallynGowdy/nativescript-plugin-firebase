@@ -200,7 +200,7 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         );
     }
 
-    public off(token: IFirebaseEventToken): void {
+    public off(eventType: string, token: IFirebaseEventToken): void {
         this.instance.removeObserverWithHandle(token);
     }
 

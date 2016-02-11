@@ -1,24 +1,5 @@
 var FirebaseCommon = (function () {
     function FirebaseCommon(instance) {
-        this.LoginType = {
-            ANONYMOUS: "anonymous",
-            PASSWORD: "password"
-        };
-        this.QueryOrderByType = {
-            KEY: "key",
-            VALUE: "value",
-            CHILD: "child",
-            PRIORITY: "priority"
-        };
-        this.QueryLimitType = {
-            FIRST: "first",
-            LAST: "last"
-        };
-        this.QueryRangeType = {
-            START_AT: "startAt",
-            END_AT: "endAt",
-            EQUAL_TO: "equalTo"
-        };
         this.instance = null;
         this.instance = instance;
     }
@@ -35,6 +16,25 @@ var FirebaseCommon = (function () {
                 reject(ex);
             }
         });
+    };
+    FirebaseCommon.LoginType = {
+        ANONYMOUS: "anonymous",
+        PASSWORD: "password"
+    };
+    FirebaseCommon.QueryOrderByType = {
+        KEY: "key",
+        VALUE: "value",
+        CHILD: "child",
+        PRIORITY: "priority"
+    };
+    FirebaseCommon.QueryLimitType = {
+        FIRST: "first",
+        LAST: "last"
+    };
+    FirebaseCommon.QueryRangeType = {
+        START_AT: "startAt",
+        END_AT: "endAt",
+        EQUAL_TO: "equalTo"
     };
     return FirebaseCommon;
 })();

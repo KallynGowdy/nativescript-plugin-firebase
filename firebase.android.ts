@@ -324,7 +324,7 @@ export default class Firebase extends FirebaseCommon implements IFirebase {
         }
     }
 
-    public off(token: IFirebaseEventToken): void {
+    public off(eventName: string, token: IFirebaseEventToken): void {
         this.instance.removeEventListener(token);
     }
 

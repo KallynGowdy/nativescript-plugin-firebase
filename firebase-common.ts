@@ -17,7 +17,7 @@ export interface IFirebase {
     /**
      * Stops listening for the event that the given token subscribes to.
      */
-    off(token: IFirebaseEventToken): void;
+    off(eventType: string, token: IFirebaseEventToken): void;
     
     /**
      * Returns a new firebase instance that represents the given path beneath this firebase instance.
