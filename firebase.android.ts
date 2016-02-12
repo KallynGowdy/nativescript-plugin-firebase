@@ -285,14 +285,19 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildAdded: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: (snapshot) => {},
+                    onChildChanged: (snapshot, previousChildKey) => {},
+                    onChildMoved: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
             case "child_changed":
                 var listener = new com.firebase.client.ChildEventListener({
-                    onChildRemoved: (snapshot) => {
-                        callback(Firebase.getCallbackData(snapshot));
+                    onChildChanged: (snapshot, previousChildKey) => {
+                        callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: (snapshot) => {},
+                    onChildMoved: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -301,6 +306,8 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildRemoved: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
+                    onChildChanged: (snapshot, previousChildKey) => {},
+                    onChildMoved: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -309,6 +316,8 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildMoved: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: (snapshot) => {},
+                    onChildChanged: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
