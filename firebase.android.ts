@@ -298,6 +298,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     },
                     onChildRemoved: (snapshot) => {},
                     onChildMoved: (snapshot, previousChildKey) => {},
+                    onChildAdded: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -308,6 +309,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     },
                     onChildChanged: (snapshot, previousChildKey) => {},
                     onChildMoved: (snapshot, previousChildKey) => {},
+                    onChildAdded: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -318,6 +320,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     },
                     onChildRemoved: (snapshot) => {},
                     onChildChanged: (snapshot, previousChildKey) => {},
+                    onChildAdded: (snapshot, previousChildKey) => {},
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);

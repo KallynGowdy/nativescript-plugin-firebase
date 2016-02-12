@@ -293,14 +293,20 @@ var Firebase = (function (_super) {
                     onChildAdded: function (snapshot, previousChildKey) {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: function (snapshot) { },
+                    onChildChanged: function (snapshot, previousChildKey) { },
+                    onChildMoved: function (snapshot, previousChildKey) { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
             case "child_changed":
                 var listener = new com.firebase.client.ChildEventListener({
-                    onChildRemoved: function (snapshot) {
-                        callback(Firebase.getCallbackData(snapshot));
+                    onChildChanged: function (snapshot, previousChildKey) {
+                        callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: function (snapshot) { },
+                    onChildMoved: function (snapshot, previousChildKey) { },
+                    onChildAdded: function (snapshot, previousChildKey) { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -309,6 +315,9 @@ var Firebase = (function (_super) {
                     onChildRemoved: function (snapshot) {
                         callback(Firebase.getCallbackData(snapshot));
                     },
+                    onChildChanged: function (snapshot, previousChildKey) { },
+                    onChildMoved: function (snapshot, previousChildKey) { },
+                    onChildAdded: function (snapshot, previousChildKey) { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -317,6 +326,9 @@ var Firebase = (function (_super) {
                     onChildMoved: function (snapshot, previousChildKey) {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
+                    onChildRemoved: function (snapshot) { },
+                    onChildChanged: function (snapshot, previousChildKey) { },
+                    onChildAdded: function (snapshot, previousChildKey) { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
