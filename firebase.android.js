@@ -18,6 +18,17 @@ var AndroidFirebaseDataSnapshot = (function () {
     return AndroidFirebaseDataSnapshot;
 })();
 exports.AndroidFirebaseDataSnapshot = AndroidFirebaseDataSnapshot;
+var AndroidFirebaseAuthData = (function () {
+    function AndroidFirebaseAuthData(authData) {
+        this.authData = authData;
+        this.uid = authData.getUid();
+        this.provider = authData.getProvider();
+        this.expires = authData.getExpires();
+        this.auth = authData.getToken();
+    }
+    return AndroidFirebaseAuthData;
+})();
+exports.AndroidFirebaseAuthData = AndroidFirebaseAuthData;
 var Firebase = (function (_super) {
     __extends(Firebase, _super);
     function Firebase(instance) {
@@ -356,6 +367,23 @@ var Firebase = (function (_super) {
     };
     Firebase.prototype.child = function (path) {
         return new Firebase(this.instance.child(path));
+    };
+    Firebase.prototype.authWithOAuthToken = function (provider, token, onComplete) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.instance.authWithOAuthToken(provider, token, new com.firebase.client.AuthResultHandler({
+                onAuthenticated: function (authData) {
+                    var androidData = new AndroidFirebaseAuthData(authData);
+                    if (onComplete) {
+                        onComplete(null, androidData);
+                    }
+                    resolve(androidData);
+                },
+                onAuthenticationError: function (error) {
+                    reject(error);
+                }
+            }));
+        });
     };
     return Firebase;
 })(firebase_common_1.FirebaseCommon);

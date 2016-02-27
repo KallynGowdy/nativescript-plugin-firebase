@@ -1,9 +1,17 @@
-import { FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken } from "./firebase-common";
+import { FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken, IFirebaseAuthData } from "./firebase-common";
 export declare class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     private _snap;
     constructor(snap: any);
     val(): any;
     key(): string;
+}
+export declare class IosFirebaseAuthData implements IFirebaseAuthData {
+    private authData;
+    constructor(authData: any);
+    uid: string;
+    provider: string;
+    auth: any;
+    expires: number;
 }
 export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
@@ -22,5 +30,6 @@ export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     setValue(path: any, val: any): Promise<{}>;
     query(updateCallback: any, path: any, options: any): Promise<{}>;
     remove(path: any): Promise<{}>;
+    authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
 }
 export declare var Firebase: typeof IosFirebase;

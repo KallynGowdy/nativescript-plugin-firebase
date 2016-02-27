@@ -1,10 +1,13 @@
+/**
+ * Defines a class that represents firebase client code that can be shared between platforms.
+ */
 var FirebaseCommon = (function () {
     function FirebaseCommon(instance) {
         this.instance = null;
         this.instance = instance;
     }
     // this implementation is actually the same for both platforms, woohoo :)
-    FirebaseCommon.prototype.logout = function (arg) {
+    FirebaseCommon.prototype.logout = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             try {
@@ -16,6 +19,9 @@ var FirebaseCommon = (function () {
                 reject(ex);
             }
         });
+    };
+    FirebaseCommon.prototype.unauth = function () {
+        return this.logout();
     };
     FirebaseCommon.LoginType = {
         ANONYMOUS: "anonymous",

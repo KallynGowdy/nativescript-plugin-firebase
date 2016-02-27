@@ -19,6 +19,17 @@ var IosFirebaseDataSnapshot = (function () {
     return IosFirebaseDataSnapshot;
 })();
 exports.IosFirebaseDataSnapshot = IosFirebaseDataSnapshot;
+var IosFirebaseAuthData = (function () {
+    function IosFirebaseAuthData(authData) {
+        this.authData = authData;
+        this.uid = authData.uid;
+        this.provider = authData.provider;
+        this.expires = authData.expires;
+        this.auth = authData.auth;
+    }
+    return IosFirebaseAuthData;
+})();
+exports.IosFirebaseAuthData = IosFirebaseAuthData;
 var IosFirebase = (function (_super) {
     __extends(IosFirebase, _super);
     function IosFirebase(instance) {
@@ -273,15 +284,29 @@ var IosFirebase = (function (_super) {
         });
     };
     IosFirebase.prototype.remove = function (path) {
+        var _this = this;
         return new Promise(function (resolve, reject) {
             try {
-                this.instance.childByAppendingPath(path).setValue(null);
+                _this.instance.childByAppendingPath(path).setValue(null);
                 resolve();
             }
             catch (ex) {
                 console.log("Error in firebase.remove: " + ex);
                 reject(ex);
             }
+        });
+    };
+    IosFirebase.prototype.authWithOAuthToken = function (provider, token, onComplete) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, function (error, authData) {
+                if (error) {
+                    reject(error);
+                }
+                else {
+                    resolve(new IosFirebaseAuthData(authData));
+                }
+            });
         });
     };
     return IosFirebase;
