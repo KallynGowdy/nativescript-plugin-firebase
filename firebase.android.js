@@ -370,8 +370,19 @@ var Firebase = (function (_super) {
     };
     Firebase.prototype.authWithOAuthToken = function (provider, token, onComplete) {
         var _this = this;
+        return this.wrapAuthCall(function (handler) {
+            _this.instance.authWithOAuthToken(provider, token, handler);
+        }, onComplete);
+    };
+    Firebase.prototype.authWithPassword = function (email, password, onComplete) {
+        var _this = this;
+        return this.wrapAuthCall(function (handler) {
+            _this.instance.authWithPassword(email, password, handler);
+        }, onComplete);
+    };
+    Firebase.prototype.wrapAuthCall = function (makeCall, onComplete) {
         return new Promise(function (resolve, reject) {
-            _this.instance.authWithOAuthToken(provider, token, new com.firebase.client.AuthResultHandler({
+            var handler = new com.firebase.client.Firebase.AuthResultHandler({
                 onAuthenticated: function (authData) {
                     var androidData = new AndroidFirebaseAuthData(authData);
                     if (onComplete) {
@@ -380,9 +391,12 @@ var Firebase = (function (_super) {
                     resolve(androidData);
                 },
                 onAuthenticationError: function (error) {
+                    if (onComplete) {
+                        onComplete(error, null);
+                    }
                     reject(error);
                 }
-            }));
+            });
         });
     };
     return Firebase;

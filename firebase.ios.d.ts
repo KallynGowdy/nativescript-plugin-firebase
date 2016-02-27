@@ -31,5 +31,7 @@ export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     query(updateCallback: any, path: any, options: any): Promise<{}>;
     remove(path: any): Promise<{}>;
     authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    private wrapAuthAttempt(makeAttempt, onComplete);
 }
 export declare var Firebase: typeof IosFirebase;

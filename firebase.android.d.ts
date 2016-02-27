@@ -32,4 +32,6 @@ export declare class Firebase extends FirebaseCommon implements IFirebase {
     set(data: any): Promise<boolean>;
     child(path: string): IFirebase;
     authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    private wrapAuthCall(makeCall, onComplete);
 }

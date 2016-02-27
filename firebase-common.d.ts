@@ -67,6 +67,12 @@ export interface IFirebase {
      */
     authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
     /**
+     * Authenticates a firebase client using the given username and password.
+     * @param email String The email address of the user.
+     * @param password String The password to use for authentication.
+     */
+    authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    /**
      * Unauthenticates the firebase client.
      */
     unauth(): Promise<boolean>;

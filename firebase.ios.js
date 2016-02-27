@@ -298,13 +298,31 @@ var IosFirebase = (function (_super) {
     };
     IosFirebase.prototype.authWithOAuthToken = function (provider, token, onComplete) {
         var _this = this;
+        return this.wrapAuthAttempt(function (handler) {
+            _this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, handler);
+        }, onComplete);
+    };
+    IosFirebase.prototype.authWithPassword = function (email, password, onComplete) {
+        var _this = this;
+        return this.wrapAuthAttempt(function (handler) {
+            _this.instance.authUserPasswordWithCompletionBlock(email, password, handler);
+        }, onComplete);
+    };
+    IosFirebase.prototype.wrapAuthAttempt = function (makeAttempt, onComplete) {
         return new Promise(function (resolve, reject) {
-            _this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, function (error, authData) {
+            makeAttempt(function (error, authData) {
                 if (error) {
+                    if (onComplete) {
+                        onComplete(error, null);
+                    }
                     reject(error);
                 }
                 else {
-                    resolve(new IosFirebaseAuthData(authData));
+                    var data = new IosFirebaseAuthData(authData);
+                    if (onComplete) {
+                        onComplete(null, data);
+                    }
+                    resolve(data);
                 }
             });
         });

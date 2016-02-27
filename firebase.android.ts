@@ -367,19 +367,34 @@ export class Firebase extends FirebaseCommon implements IFirebase {
     }
 
     public authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthCall((handler: any) => {
+           this.instance.authWithOAuthToken(provider, token, handler); 
+        }, onComplete);
+    }
+
+    public authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthCall((handler) => {
+            this.instance.authWithPassword(email, password, handler);
+        }, onComplete);
+    }
+
+    private wrapAuthCall(makeCall: (authHandler: any) => void, onComplete: Function): Promise<IFirebaseAuthData> {
         return new Promise<IFirebaseAuthData>((resolve, reject) => {
-            this.instance.authWithOAuthToken(provider, token, new com.firebase.client.AuthResultHandler({
+            var handler = new com.firebase.client.Firebase.AuthResultHandler({
                 onAuthenticated: (authData) => {
-                    var androidData: AndroidFirebaseAuthData = new AndroidFirebaseAuthData(authData); 
-                    if(onComplete) {
+                    var androidData: AndroidFirebaseAuthData = new AndroidFirebaseAuthData(authData);
+                    if (onComplete) {
                         onComplete(null, androidData)
                     }
                     resolve(androidData);
                 },
                 onAuthenticationError: (error) => {
+                    if(onComplete) {
+                        onComplete(error, null);
+                    }
                     reject(error);
                 }
-            }));
-        });
+            });
+        })
     }
 }

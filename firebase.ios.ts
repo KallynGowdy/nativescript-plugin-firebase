@@ -309,12 +309,31 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
     }
     
     public authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthAttempt((handler) => {
+            this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, handler); 
+        }, onComplete);
+    }
+    
+    public authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthAttempt((handler) => {
+            this.instance.authUserPasswordWithCompletionBlock(email, password, handler);
+        }, onComplete);
+    }
+    
+    private wrapAuthAttempt(makeAttempt: (handler: Function) => void, onComplete: Function): Promise<IFirebaseAuthData> {
         return new Promise<IFirebaseAuthData>((resolve, reject) => {
-            this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, (error, authData) => {
+            makeAttempt((error, authData) => {
                if(error) {
+                   if(onComplete) {
+                       onComplete(error, null);
+                   }
                    reject(error);
                } else {
-                   resolve(new IosFirebaseAuthData(authData));
+                   var data = new IosFirebaseAuthData(authData);
+                   if(onComplete) {
+                       onComplete(null, data)
+                   }
+                   resolve(data);
                }
             });
         });
