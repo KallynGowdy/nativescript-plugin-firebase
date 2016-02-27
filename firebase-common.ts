@@ -1,7 +1,42 @@
 declare var Promise: any;
 
+/**
+ * Defines an interface that represents objects that contain firebase authentication data.
+ */
+export interface IFirebaseAuthData {
+    /**
+     * The UID of the user.
+     */
+    uid: string;
+    
+    /**
+     * The provider that the user used to authenticate.
+     */
+    provider: string;
+    
+    /**
+     * The authentication token payload.
+     */
+    auth: any;
+    
+    /**
+     * The expiration time of the token in seconds since the Unix epoch.
+     */
+    expires: number;
+}
+
+/**
+ * Defines an interface that specifies what capabilities a firebase data snapshot has.
+ */
 export interface IFirebaseDataSnapshot {
+    /**
+     * Gets the data value from this snapshot.
+     */
     val(): any;
+    
+    /**
+     * Gets the key that this snapshot represents.
+     */
     key(): string;
 }
 
@@ -38,6 +73,18 @@ export interface IFirebase {
      * Sets the data at this firebase location.
      */
     set(data: any): Promise<boolean>;
+        
+    /**
+     * Authenticates a firebase client to the given provider using the given OAuth token.
+     * @param provider String The unique string identifying the OAuth provider to authenticate with, e.g. `google`.
+     * @param token String The OAuth token.
+     */
+    authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    
+    /**
+     * Unauthenticates the firebase client.
+     */
+    unauth(): Promise<boolean>;
 }
 
 /**
@@ -46,6 +93,9 @@ export interface IFirebase {
  */
 export interface IFirebaseEventToken {}
 
+/**
+ * Defines a class that represents firebase client code that can be shared between platforms.
+ */
 export class FirebaseCommon {
 
     constructor(instance: any) {
@@ -78,7 +128,7 @@ export class FirebaseCommon {
     protected instance: any = null;
 
     // this implementation is actually the same for both platforms, woohoo :)
-    logout(arg) {
+    public logout() {
         return new Promise((resolve, reject) => {
             try {
                 this.instance.unauth();
@@ -88,5 +138,9 @@ export class FirebaseCommon {
                 reject(ex);
             }
         });
+    }
+    
+    public unauth() {
+        return this.logout();
     }
 };

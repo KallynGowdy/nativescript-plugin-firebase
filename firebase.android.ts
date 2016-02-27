@@ -1,5 +1,5 @@
 import * as appModule from "application";
-import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} from "./firebase-common";
+import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken, IFirebaseAuthData} from "./firebase-common";
 
 declare var java: any;
 declare var com;
@@ -18,6 +18,21 @@ export class AndroidFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     public key(): string {
         return this._snap.getKey()
     }
+}
+
+export class AndroidFirebaseAuthData implements IFirebaseAuthData {
+
+    constructor(private authData: any) {
+        this.uid = authData.getUid();
+        this.provider = authData.getProvider();
+        this.expires = authData.getExpires();
+        this.auth = authData.getToken();
+    }
+
+    public uid: string;
+    public provider: string;
+    public auth: any;
+    public expires: number;
 }
 
 export class Firebase extends FirebaseCommon implements IFirebase {
@@ -285,9 +300,9 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildAdded: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onChildRemoved: (snapshot) => {},
-                    onChildChanged: (snapshot, previousChildKey) => {},
-                    onChildMoved: (snapshot, previousChildKey) => {},
+                    onChildRemoved: (snapshot) => { },
+                    onChildChanged: (snapshot, previousChildKey) => { },
+                    onChildMoved: (snapshot, previousChildKey) => { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -296,9 +311,9 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildChanged: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onChildRemoved: (snapshot) => {},
-                    onChildMoved: (snapshot, previousChildKey) => {},
-                    onChildAdded: (snapshot, previousChildKey) => {},
+                    onChildRemoved: (snapshot) => { },
+                    onChildMoved: (snapshot, previousChildKey) => { },
+                    onChildAdded: (snapshot, previousChildKey) => { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -307,9 +322,9 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildRemoved: (snapshot) => {
                         callback(Firebase.getCallbackData(snapshot));
                     },
-                    onChildChanged: (snapshot, previousChildKey) => {},
-                    onChildMoved: (snapshot, previousChildKey) => {},
-                    onChildAdded: (snapshot, previousChildKey) => {},
+                    onChildChanged: (snapshot, previousChildKey) => { },
+                    onChildMoved: (snapshot, previousChildKey) => { },
+                    onChildAdded: (snapshot, previousChildKey) => { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -318,9 +333,9 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onChildMoved: (snapshot, previousChildKey) => {
                         callback(Firebase.getCallbackData(snapshot), previousChildKey);
                     },
-                    onChildRemoved: (snapshot) => {},
-                    onChildChanged: (snapshot, previousChildKey) => {},
-                    onChildAdded: (snapshot, previousChildKey) => {},
+                    onChildRemoved: (snapshot) => { },
+                    onChildChanged: (snapshot, previousChildKey) => { },
+                    onChildAdded: (snapshot, previousChildKey) => { },
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
@@ -349,5 +364,22 @@ export class Firebase extends FirebaseCommon implements IFirebase {
 
     public child(path: string): IFirebase {
         return new Firebase(this.instance.child(path));
+    }
+
+    public authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return new Promise<IFirebaseAuthData>((resolve, reject) => {
+            this.instance.authWithOAuthToken(provider, token, new com.firebase.client.AuthResultHandler({
+                onAuthenticated: (authData) => {
+                    var androidData: AndroidFirebaseAuthData = new AndroidFirebaseAuthData(authData); 
+                    if(onComplete) {
+                        onComplete(null, androidData)
+                    }
+                    resolve(androidData);
+                },
+                onAuthenticationError: (error) => {
+                    reject(error);
+                }
+            }));
+        });
     }
 }

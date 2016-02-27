@@ -1,5 +1,5 @@
 import * as appModule from "application";
-import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken} from "./firebase-common";
+import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken, IFirebaseAuthData} from "./firebase-common";
 import * as types from "utils/types";
 
 declare var FEventType: any;
@@ -20,6 +20,20 @@ export class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     public key(): string {
         return this._snap.key;
     }
+}
+
+export class IosFirebaseAuthData implements IFirebaseAuthData {
+    constructor(private authData: any) {
+        this.uid = authData.uid;
+        this.provider = authData.provider;
+        this.expires = authData.expires;
+        this.auth = authData.auth;
+    }
+
+    public uid: string;
+    public provider: string;
+    public auth: any;
+    public expires: number;
 }
 
 export class IosFirebase extends FirebaseCommon implements IFirebase {
@@ -283,7 +297,7 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
     }
 
     public remove(path) {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             try {
                 this.instance.childByAppendingPath(path).setValue(null);
                 resolve();
@@ -291,6 +305,18 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
                 console.log("Error in firebase.remove: " + ex);
                 reject(ex);
             }
+        });
+    }
+    
+    public authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return new Promise<IFirebaseAuthData>((resolve, reject) => {
+            this.instance.authWithOAuthProviderTokenWithCompletionBlock(provider, token, (error, authData) => {
+               if(error) {
+                   reject(error);
+               } else {
+                   resolve(new IosFirebaseAuthData(authData));
+               }
+            });
         });
     }
 }
