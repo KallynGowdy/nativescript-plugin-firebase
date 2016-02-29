@@ -26,13 +26,15 @@ export class AndroidFirebaseAuthData implements IFirebaseAuthData {
         this.uid = authData.getUid();
         this.provider = authData.getProvider();
         this.expires = authData.getExpires();
-        this.auth = authData.getToken();
+        this.auth = authData.getAuth();
+        this.token = authData.getToken();
     }
 
     public uid: string;
     public provider: string;
     public auth: any;
     public expires: number;
+    public token: string;
 }
 
 export class Firebase extends FirebaseCommon implements IFirebase {
@@ -378,6 +380,21 @@ export class Firebase extends FirebaseCommon implements IFirebase {
         }, onComplete);
     }
 
+    public authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthCall((handler) => {
+            this.instance.authWithCustomToken(token, handler); 
+        }, onComplete);
+    }
+
+    public getAuth(): IFirebaseAuthData {
+        var data = this.instance.getAuth();
+        if(data !== null) {
+            return new AndroidFirebaseAuthData(data);
+        } else {
+            return null;
+        }
+    }
+
     private wrapAuthCall(makeCall: (authHandler: any) => void, onComplete: Function): Promise<IFirebaseAuthData> {
         return new Promise<IFirebaseAuthData>((resolve, reject) => {
             var handler = new com.firebase.client.Firebase.AuthResultHandler({
@@ -395,6 +412,8 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     reject(error);
                 }
             });
+            
+            makeCall(handler);
         })
     }
 }

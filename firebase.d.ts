@@ -89,9 +89,21 @@ export interface IFirebase {
     authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
     
     /**
+     * Authenticates the firebase client using the given custom token.
+     * @param token String The custom token to use for authentication.
+     * @param onComplete Function A function that is called when the operation is complete.
+     */
+    authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    
+    /**
      * Unauthenticates the firebase client.
      */
     unauth(): Promise<boolean>;
+    
+    /**
+     * Retrieves the current authentication data from the client.
+     */
+    getAuth(): IFirebaseAuthData;
 }
     /**
      * Defines a class that represents a token that
@@ -150,6 +162,8 @@ export interface IFirebase {
         child(path: string): IFirebase;
         authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
         authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+        authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
         unauth(): Promise<boolean>;
+        getAuth(): IFirebaseAuthData;
     }
 }

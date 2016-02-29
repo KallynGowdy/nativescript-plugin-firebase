@@ -28,12 +28,14 @@ export class IosFirebaseAuthData implements IFirebaseAuthData {
         this.provider = authData.provider;
         this.expires = authData.expires;
         this.auth = authData.auth;
+        this.token = authData.token;
     }
 
     public uid: string;
     public provider: string;
     public auth: any;
     public expires: number;
+    public token: string;
 }
 
 export class IosFirebase extends FirebaseCommon implements IFirebase {
@@ -318,6 +320,21 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         return this.wrapAuthAttempt((handler) => {
             this.instance.authUserPasswordWithCompletionBlock(email, password, handler);
         }, onComplete);
+    }
+    
+    public authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData> {
+        return this.wrapAuthAttempt((handler) => {
+            this.instance.authWithCustomTokenWithCompletionBlock(token, handler); 
+        }, onComplete);
+    }
+    
+    public getAuth(): IFirebaseAuthData {
+        var data = this.instance.auth;
+        if(data !== null) {
+            return new IosFirebaseAuthData(data);
+        } else {
+            return null;
+        }
     }
     
     private wrapAuthAttempt(makeAttempt: (handler: Function) => void, onComplete: Function): Promise<IFirebaseAuthData> {

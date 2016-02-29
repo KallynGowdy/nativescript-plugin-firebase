@@ -15,6 +15,10 @@ export interface IFirebaseAuthData {
      */
     auth: any;
     /**
+     * The token used to authenticate the client to Firebase.
+     */
+    token: string;
+    /**
      * The expiration time of the token in seconds since the Unix epoch.
      */
     expires: number;
@@ -73,9 +77,19 @@ export interface IFirebase {
      */
     authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
     /**
+     * Authenticates the firebase client using the given custom token.
+     * @param token String The custom token to use for authentication.
+     * @param onComplete Function A function that is called when the operation is complete.
+     */
+    authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    /**
      * Unauthenticates the firebase client.
      */
     unauth(): Promise<boolean>;
+    /**
+     * Retrieves the current authentication data from the client.
+     */
+    getAuth(): IFirebaseAuthData;
 }
 /**
  * Defines a class that represents a token that

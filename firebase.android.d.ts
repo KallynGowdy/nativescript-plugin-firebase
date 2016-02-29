@@ -12,6 +12,7 @@ export declare class AndroidFirebaseAuthData implements IFirebaseAuthData {
     provider: string;
     auth: any;
     expires: number;
+    token: string;
 }
 export declare class Firebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
@@ -33,5 +34,7 @@ export declare class Firebase extends FirebaseCommon implements IFirebase {
     child(path: string): IFirebase;
     authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
     authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    getAuth(): IFirebaseAuthData;
     private wrapAuthCall(makeCall, onComplete);
 }

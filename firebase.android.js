@@ -24,7 +24,8 @@ var AndroidFirebaseAuthData = (function () {
         this.uid = authData.getUid();
         this.provider = authData.getProvider();
         this.expires = authData.getExpires();
-        this.auth = authData.getToken();
+        this.auth = authData.getAuth();
+        this.token = authData.getToken();
     }
     return AndroidFirebaseAuthData;
 })();
@@ -380,6 +381,21 @@ var Firebase = (function (_super) {
             _this.instance.authWithPassword(email, password, handler);
         }, onComplete);
     };
+    Firebase.prototype.authWithCustomToken = function (token, onComplete) {
+        var _this = this;
+        return this.wrapAuthCall(function (handler) {
+            _this.instance.authWithCustomToken(token, handler);
+        }, onComplete);
+    };
+    Firebase.prototype.getAuth = function () {
+        var data = this.instance.getAuth();
+        if (data !== null) {
+            return new AndroidFirebaseAuthData(data);
+        }
+        else {
+            return null;
+        }
+    };
     Firebase.prototype.wrapAuthCall = function (makeCall, onComplete) {
         return new Promise(function (resolve, reject) {
             var handler = new com.firebase.client.Firebase.AuthResultHandler({
@@ -397,6 +413,7 @@ var Firebase = (function (_super) {
                     reject(error);
                 }
             });
+            makeCall(handler);
         });
     };
     return Firebase;

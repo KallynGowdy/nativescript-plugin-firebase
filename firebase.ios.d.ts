@@ -12,6 +12,7 @@ export declare class IosFirebaseAuthData implements IFirebaseAuthData {
     provider: string;
     auth: any;
     expires: number;
+    token: string;
 }
 export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     constructor(instance: any);
@@ -32,6 +33,8 @@ export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     remove(path: any): Promise<{}>;
     authWithOAuthToken(provider: string, token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
     authWithPassword(email: string, password: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    authWithCustomToken(token: string, onComplete?: Function): Promise<IFirebaseAuthData>;
+    getAuth(): IFirebaseAuthData;
     private wrapAuthAttempt(makeAttempt, onComplete);
 }
 export declare var Firebase: typeof IosFirebase;
