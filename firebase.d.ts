@@ -158,11 +158,11 @@ export interface IFirebase {
         key(): string;
         login(arg: any): Promise<{}>;
         createUser(arg: any): Promise<any>;
-        push(data: any, callback: (err: any) => void): IFirebase|Promise<IFirebase>;
+        push(data: any, callback?: (err: any) => void): IFirebase|Promise<IFirebase>;
         setValue(path: any, val: any): Promise<{}>;
         query(updateCallback: any, path: any, options: any): Promise<{}>;
         remove(key?: string): Promise<boolean>;
-        on(eventName: string, callback: Function, errorCallback?: (err: any) => void): IFirebaseEventToken;
+        on(eventName: string, callback?: Function, errorCallback?: (err: any) => void): IFirebaseEventToken;
         off(eventName: string, token: IFirebaseEventToken): void;
         set(data: any): Promise<boolean>;
         child(path: string): IFirebase;
