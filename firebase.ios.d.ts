@@ -23,7 +23,7 @@ export declare class IosFirebase extends FirebaseCommon implements IFirebase {
     }): IFirebase;
     login(arg: any): Promise<{}>;
     createUser(arg: any): Promise<{}>;
-    push(data: any): Promise<boolean>;
+    push(data: any): IFirebase | Promise<IFirebase>;
     set(data: any): Promise<boolean>;
     child(path: string): IFirebase;
     on(eventName: string, callback: Function, errorCallback?: (err: any) => void): IFirebaseEventToken;

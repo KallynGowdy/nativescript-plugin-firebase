@@ -147,7 +147,12 @@ var IosFirebase = (function (_super) {
         });
     };
     IosFirebase.prototype.push = function (data) {
-        return new IosFirebase(this.instance.childByAutoId()).set(data);
+        var fb = new IosFirebase(this.instance.childByAutoId());
+        var promise = fb.set(data);
+        fb.then = promise.then.bind(promise);
+        fb.catch = promise.catch.bind(promise);
+        fb.finally = promise.finally.bind(promise);
+        return fb;
     };
     IosFirebase.prototype.set = function (data) {
         var _this = this;

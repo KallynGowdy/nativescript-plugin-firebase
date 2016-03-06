@@ -190,8 +190,13 @@ export class Firebase extends FirebaseCommon implements IFirebase {
         });
     };
 
-    public push(data: any): Promise<boolean> {
-        return new Firebase(this.instance.push()).set(data);
+    public push(data: any): IFirebase|Promise<IFirebase> {
+        var fb: any = new Firebase(this.instance.push());
+        var promise = fb.set(data);
+        fb.then = promise.then;
+        fb.catch = promise.catch;
+        fb.finally = promise.finally;
+        return fb;
     };
 
     public setValue(path, val) {

@@ -186,7 +186,12 @@ var Firebase = (function (_super) {
     };
     ;
     Firebase.prototype.push = function (data) {
-        return new Firebase(this.instance.push()).set(data);
+        var fb = new Firebase(this.instance.push());
+        var promise = fb.set(data);
+        fb.then = promise.then;
+        fb.catch = promise.catch;
+        fb.finally = promise.finally;
+        return fb;
     };
     ;
     Firebase.prototype.setValue = function (path, val) {

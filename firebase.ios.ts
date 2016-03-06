@@ -154,8 +154,13 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         });
     }
 
-    public push(data: any): Promise<boolean> {
-        return new IosFirebase(this.instance.childByAutoId()).set(data);
+    public push(data: any): IFirebase|Promise<IFirebase> {
+        var fb: any = new IosFirebase(this.instance.childByAutoId());
+        var promise = fb.set(data);
+        fb.then = promise.then.bind(promise);
+        fb.catch = promise.catch.bind(promise);
+        fb.finally = promise.finally.bind(promise);
+        return fb;
     }
 
     public set(data: any): Promise<boolean> {

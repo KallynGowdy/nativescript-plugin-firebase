@@ -72,7 +72,7 @@ export interface IFirebase {
     /**
      * Adds the given data to this firebase location.
      */
-    push(data: any): Promise<boolean>;
+    push(data: any, callback: (err: any) => void): IFirebase|Promise<IFirebase>;
     
     /**
      * Sets the data at this firebase location.
