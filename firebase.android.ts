@@ -190,6 +190,10 @@ export class Firebase extends FirebaseCommon implements IFirebase {
         });
     };
 
+    public key(): string {
+        return this.instance.getKey();
+    }
+
     public push(data: any): IFirebase|Promise<IFirebase> {
         var fb: any = new Firebase(this.instance.push());
         var promise = fb.set(data);

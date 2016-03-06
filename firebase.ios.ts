@@ -153,6 +153,10 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
             }
         });
     }
+    
+    public key(): string {
+        return this.instance.key;
+    }
 
     public push(data: any): IFirebase|Promise<IFirebase> {
         var fb: any = new IosFirebase(this.instance.childByAutoId());

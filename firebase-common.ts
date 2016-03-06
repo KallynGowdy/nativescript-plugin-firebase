@@ -49,6 +49,12 @@ export interface IFirebaseDataSnapshot {
  * Defines an interface that specifies what a standarized firebase instance looks like.
  */
 export interface IFirebase {
+    
+    /**
+     * Gets the key for this location.
+     */
+    key(): string;
+    
     /**
      * Listens for events with the given name.
      */
