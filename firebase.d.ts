@@ -155,9 +155,10 @@ export interface IFirebase {
         static createNew(arg: {
             url: string;
         }): IFirebase;
+        key(): string;
         login(arg: any): Promise<{}>;
         createUser(arg: any): Promise<any>;
-        push(data: any): Promise<boolean>;
+        push(data: any, callback: (err: any) => void): IFirebase|Promise<IFirebase>;
         setValue(path: any, val: any): Promise<{}>;
         query(updateCallback: any, path: any, options: any): Promise<{}>;
         remove(key?: string): Promise<boolean>;
