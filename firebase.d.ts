@@ -45,6 +45,11 @@ export interface IFirebaseDataSnapshot {
  */
 export interface IFirebase {
     /**
+     * Gets the key for this location.
+     */
+    key(): string;
+    
+    /**
      * Listens for events with the given name.
      */
     on(eventName: string, callback: Function, errCallback: (err: any) => void): IFirebaseEventToken;
@@ -67,7 +72,7 @@ export interface IFirebase {
     /**
      * Adds the given data to this firebase location.
      */
-    push(data: any): Promise<boolean>;
+    push(data: any, callback: (err: any) => void): IFirebase|Promise<IFirebase>;
     
     /**
      * Sets the data at this firebase location.

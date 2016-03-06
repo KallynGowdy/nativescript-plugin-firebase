@@ -185,6 +185,9 @@ var Firebase = (function (_super) {
         });
     };
     ;
+    Firebase.prototype.key = function () {
+        return this.instance.getKey();
+    };
     Firebase.prototype.push = function (data) {
         var fb = new Firebase(this.instance.push());
         var promise = fb.set(data);

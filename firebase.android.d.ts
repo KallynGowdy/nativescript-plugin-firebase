@@ -24,6 +24,7 @@ export declare class Firebase extends FirebaseCommon implements IFirebase {
     }): IFirebase;
     login(arg: any): Promise<{}>;
     createUser(arg: any): Promise<any>;
+    key(): string;
     push(data: any): IFirebase | Promise<IFirebase>;
     setValue(path: any, val: any): Promise<{}>;
     query(updateCallback: any, path: any, options: any): Promise<{}>;

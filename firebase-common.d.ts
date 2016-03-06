@@ -41,6 +41,10 @@ export interface IFirebaseDataSnapshot {
  */
 export interface IFirebase {
     /**
+     * Gets the key for this location.
+     */
+    key(): string;
+    /**
      * Listens for events with the given name.
      */
     on(eventName: string, callback: Function, errCallback: (err: any) => void): IFirebaseEventToken;
