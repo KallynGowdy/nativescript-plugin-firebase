@@ -190,6 +190,10 @@ export class Firebase extends FirebaseCommon implements IFirebase {
         });
     };
 
+    public root(): IFirebase {
+        return new Firebase(this.instance.getRoot());
+    }
+
     public key(): string {
         return this.instance.getKey();
     }

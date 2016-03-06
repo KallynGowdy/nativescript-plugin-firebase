@@ -50,6 +50,11 @@ export interface IFirebase {
     key(): string;
     
     /**
+     * Gets a firebase reference to the root of the location.
+     */
+    root(): IFirebase;
+    
+    /**
      * Listens for events with the given name.
      */
     on(eventName: string, callback: Function, errCallback: (err: any) => void): IFirebaseEventToken;
@@ -155,6 +160,7 @@ export interface IFirebase {
         static createNew(arg: {
             url: string;
         }): IFirebase;
+        root(): IFirebase;
         key(): string;
         login(arg: any): Promise<{}>;
         createUser(arg: any): Promise<any>;

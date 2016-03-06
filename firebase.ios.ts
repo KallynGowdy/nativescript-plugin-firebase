@@ -154,6 +154,10 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         });
     }
     
+    public root(): IFirebase {
+        return new IosFirebase(this.instance.root);
+    }
+    
     public key(): string {
         return this.instance.key;
     }
