@@ -146,6 +146,9 @@ var IosFirebase = (function (_super) {
             }
         });
     };
+    IosFirebase.prototype.root = function () {
+        return new IosFirebase(this.instance.root);
+    };
     IosFirebase.prototype.key = function () {
         return this.instance.key;
     };

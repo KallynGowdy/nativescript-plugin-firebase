@@ -185,6 +185,9 @@ var Firebase = (function (_super) {
         });
     };
     ;
+    Firebase.prototype.root = function () {
+        return new Firebase(this.instance.getRoot());
+    };
     Firebase.prototype.key = function () {
         return this.instance.getKey();
     };
@@ -307,7 +310,6 @@ var Firebase = (function (_super) {
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addValueEventListener(eventListener);
-                break;
             case "child_added":
                 var listener = new com.firebase.client.ChildEventListener({
                     onChildAdded: function (snapshot, previousChildKey) {
@@ -352,7 +354,6 @@ var Firebase = (function (_super) {
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
-                break;
         }
     };
     Firebase.prototype.off = function (eventName, token) {
@@ -361,7 +362,7 @@ var Firebase = (function (_super) {
     Firebase.prototype.set = function (data) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var listener = new com.firebase.client.CompletionListener({
+            var listener = new com.firebase.client.Firebase.CompletionListener({
                 onComplete: function (err) {
                     if (err) {
                         reject(err);

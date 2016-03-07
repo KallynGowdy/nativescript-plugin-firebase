@@ -309,7 +309,6 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addValueEventListener(eventListener);
-                break;
             case "child_added":
                 var listener = new com.firebase.client.ChildEventListener({
                     onChildAdded: (snapshot, previousChildKey) => {
@@ -354,7 +353,6 @@ export class Firebase extends FirebaseCommon implements IFirebase {
                     onCancelled: cancelledCallback
                 });
                 return this.instance.addChildEventListener(listener);
-                break;
         }
     }
 
@@ -364,7 +362,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
 
     public set(data: any): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            var listener = new com.firebase.client.CompletionListener({
+            var listener = new com.firebase.client.Firebase.CompletionListener({
                 onComplete: (err) => {
                     if (err) {
                         reject(err);

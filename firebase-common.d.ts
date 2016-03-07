@@ -45,9 +45,13 @@ export interface IFirebase {
      */
     key(): string;
     /**
+     * Gets a firebase reference to the root of the location.
+     */
+    root(): IFirebase;
+    /**
      * Listens for events with the given name.
      */
-    on(eventName: string, callback: Function, errCallback: (err: any) => void): IFirebaseEventToken;
+    on(eventName: string, callback?: Function, errCallback?: (err: any) => void): IFirebaseEventToken;
     /**
      * Stops listening for the event that the given token subscribes to.
      */
@@ -63,7 +67,7 @@ export interface IFirebase {
     /**
      * Adds the given data to this firebase location.
      */
-    push(data: any, callback: (err: any) => void): IFirebase | Promise<IFirebase>;
+    push(data: any, callback?: (err: any) => void): IFirebase | Promise<IFirebase>;
     /**
      * Sets the data at this firebase location.
      */
