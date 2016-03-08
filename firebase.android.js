@@ -362,17 +362,13 @@ var Firebase = (function (_super) {
     Firebase.prototype.set = function (data) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            var listener = new com.firebase.client.Firebase.CompletionListener({
-                onComplete: function (err) {
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        resolve(true);
-                    }
-                }
-            });
-            _this.instance.setValue(Firebase.toHashMap(data), listener);
+            try {
+                _this.instance.setValue(Firebase.toHashMap(data));
+                resolve(true);
+            }
+            catch (err) {
+                reject(err);
+            }
         });
     };
     Firebase.prototype.child = function (path) {
