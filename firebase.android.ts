@@ -363,7 +363,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
     public set(data: any): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             var listener = new com.firebase.client.Firebase.CompletionListener({
-                onComplete: (err) => {
+                onComplete: (err, ref) => {
                     if (err) {
                         reject(err);
                     } else {
