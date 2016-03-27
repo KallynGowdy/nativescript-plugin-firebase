@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var firebase_common_1 = require("./firebase-common");
 var types = require("utils/types");
-var IosFirebaseClass = exports.Firebase;
+var IosFirebaseClass = global.Firebase;
 var IosFirebaseDataSnapshot = (function () {
     function IosFirebaseDataSnapshot(snap) {
         this._snap = snap;

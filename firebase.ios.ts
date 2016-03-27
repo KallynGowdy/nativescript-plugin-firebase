@@ -1,10 +1,9 @@
 import * as appModule from "application";
 import {FirebaseCommon, IFirebase, IFirebaseDataSnapshot, IFirebaseEventToken, IFirebaseAuthData} from "./firebase-common";
 import * as types from "utils/types";
-
 declare var FEventType: any;
 
-var IosFirebaseClass: any = Firebase;
+var IosFirebaseClass: any = global.Firebase;
 
 export class IosFirebaseDataSnapshot implements IFirebaseDataSnapshot {
     private _snap: any;
