@@ -91,7 +91,11 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
     };
 
     public static createNew(arg: { url: string }): IFirebase {
-        return new IosFirebaseClass(arg.url);
+        if(typeof IosFirebaseClass !== "function") {
+            console.error("global.Firebase did not retrieve the correct Firebase global object. Instead, the type of IosFirebaseClass is:", typeof IosFirebaseClass);
+        }
+        var instance = new IosFirebaseClass(arg.url);
+        return new IosFirebase(instance);
     }
 
     public login(arg) {
