@@ -1,6 +1,6 @@
 {
   "name": "nativescript-plugin-firebase-common",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "Fire. Base. Firebase!",
   "main": "firebase.js",
   "nativescript": {
