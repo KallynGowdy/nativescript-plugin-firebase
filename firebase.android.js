@@ -114,7 +114,6 @@ var Firebase = (function (_super) {
     Firebase.createNew = function (arg) {
         var JavaFirebase = com.firebase.client.Firebase;
         JavaFirebase.setAndroidContext(appModule.android.context);
-        var instance = new JavaFirebase(arg.url);
         // Implementation taken from https://github.com/EddyVerbruggen/nativescript-plugin-firebase
         if (arg.persist !== false && !JavaFirebase.getDefaultConfig().isPersistenceEnabled()) {
             JavaFirebase.getDefaultConfig().setPersistenceEnabled(true);
@@ -122,6 +121,7 @@ var Firebase = (function (_super) {
         else {
             JavaFirebase.getDefaultConfig().setPersistenceEnabled(false);
         }
+        var instance = new JavaFirebase(arg.url);
         return new Firebase(instance);
     };
     ;

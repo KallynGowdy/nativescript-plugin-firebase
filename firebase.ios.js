@@ -84,7 +84,6 @@ var IosFirebase = (function (_super) {
         if (typeof IosFirebaseClass !== "function") {
             console.error("global.Firebase did not retrieve the correct Firebase global object. Instead, the type of IosFirebaseClass is:", typeof IosFirebaseClass);
         }
-        var instance = new IosFirebaseClass(arg.url);
         // Implementation taken from https://github.com/EddyVerbruggen/nativescript-plugin-firebase
         if (arg.persist !== false) {
             IosFirebaseClass.defaultConfig().persistenceEnabled = true;
@@ -92,6 +91,7 @@ var IosFirebase = (function (_super) {
         else {
             IosFirebaseClass.defaultConfig().persistenceEnabled = false;
         }
+        var instance = new IosFirebaseClass(arg.url);
         return new IosFirebase(instance);
     };
     IosFirebase.prototype.login = function (arg) {

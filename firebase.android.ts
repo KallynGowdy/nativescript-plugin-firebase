@@ -123,14 +123,13 @@ export class Firebase extends FirebaseCommon implements IFirebase {
     public static createNew(arg: { url: string, persist: boolean }): IFirebase {
         var JavaFirebase = com.firebase.client.Firebase;
         JavaFirebase.setAndroidContext(appModule.android.context);
-        var instance = new JavaFirebase(arg.url);
-
         // Implementation taken from https://github.com/EddyVerbruggen/nativescript-plugin-firebase
         if(arg.persist !== false && !JavaFirebase.getDefaultConfig().isPersistenceEnabled()) {
             JavaFirebase.getDefaultConfig().setPersistenceEnabled(true);
         } else {
             JavaFirebase.getDefaultConfig().setPersistenceEnabled(false);
         }
+        var instance = new JavaFirebase(arg.url);
         return new Firebase(instance);
     };
 
