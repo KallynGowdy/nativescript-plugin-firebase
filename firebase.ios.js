@@ -81,7 +81,11 @@ var IosFirebase = (function (_super) {
     };
     ;
     IosFirebase.createNew = function (arg) {
-        return new IosFirebaseClass(arg.url);
+        if (typeof IosFirebaseClass !== "function") {
+            console.error("global.Firebase did not retrieve the correct Firebase global object. Instead, the type of IosFirebaseClass is:", typeof IosFirebaseClass);
+        }
+        var instance = new IosFirebaseClass(arg.url);
+        return new IosFirebase(instance);
     };
     IosFirebase.prototype.login = function (arg) {
         return new Promise(function (resolve, reject) {

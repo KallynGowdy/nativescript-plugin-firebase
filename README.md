@@ -39,6 +39,7 @@ tns plugin add nativescript-plugin-firebase-common
 
   var firebase = Firebase.createNew({
     url: 'https://resplendent-fire-4211.firebaseio.com'
+    // persist: false // turn off offline disk persistence
   });
 ```
 

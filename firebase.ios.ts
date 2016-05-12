@@ -90,11 +90,18 @@ export class IosFirebase extends FirebaseCommon implements IFirebase {
         return new IosFirebaseDataSnapshot(snapshot);
     };
 
-    public static createNew(arg: { url: string }): IFirebase {
+    public static createNew(arg: { url: string, persist: boolean }): IFirebase {
         if(typeof IosFirebaseClass !== "function") {
             console.error("global.Firebase did not retrieve the correct Firebase global object. Instead, the type of IosFirebaseClass is:", typeof IosFirebaseClass);
         }
         var instance = new IosFirebaseClass(arg.url);
+
+        // Implementation taken from https://github.com/EddyVerbruggen/nativescript-plugin-firebase
+        if(arg.persist !== false) {
+            IosFirebaseClass.defaultConfig().persistenceEnabled = true;
+        } else {
+            IosFirebaseClass.defaultConfig().persistenceEnabled = false;
+        }
         return new IosFirebase(instance);
     }
 

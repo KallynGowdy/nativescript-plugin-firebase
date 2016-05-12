@@ -158,7 +158,8 @@ export interface IFirebase {
         static toJsObject(javaObj: any): any;
         static getCallbackData(snapshot: any): IFirebaseDataSnapshot;
         static createNew(arg: {
-            url: string;
+            url: string,
+            persist?: boolean
         }): IFirebase;
         root(): IFirebase;
         key(): string;
