@@ -21,6 +21,7 @@ export declare class Firebase extends FirebaseCommon implements IFirebase {
     static getCallbackData(snapshot: any): IFirebaseDataSnapshot;
     static createNew(arg: {
         url: string;
+        persist: boolean;
     }): IFirebase;
     login(arg: any): Promise<{}>;
     createUser(arg: any): Promise<any>;
