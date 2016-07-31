@@ -134,7 +134,7 @@ export class Firebase extends FirebaseCommon implements IFirebase {
     };
 
     public login(arg: any) {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             try {
                 var authorizer = new com.firebase.client.Firebase.AuthResultHandler({
                     onAuthenticated: function(authData) {
