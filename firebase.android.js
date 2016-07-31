@@ -126,6 +126,7 @@ var Firebase = (function (_super) {
     };
     ;
     Firebase.prototype.login = function (arg) {
+        var _this = this;
         return new Promise(function (resolve, reject) {
             try {
                 var authorizer = new com.firebase.client.Firebase.AuthResultHandler({
@@ -144,14 +145,14 @@ var Firebase = (function (_super) {
                 });
                 var type = arg.type;
                 if (type === firebase_common_1.FirebaseCommon.LoginType.ANONYMOUS) {
-                    this.instance.authAnonymously(authorizer);
+                    _this.instance.authAnonymously(authorizer);
                 }
                 else if (type === Firebase.LoginType.PASSWORD) {
                     if (!arg.email || !arg.password) {
                         reject("Auth type emailandpassword requires an email and password argument");
                     }
                     else {
-                        this.instance.authWithPassword(arg.email, arg.password, authorizer);
+                        _this.instance.authWithPassword(arg.email, arg.password, authorizer);
                     }
                 }
                 else {
